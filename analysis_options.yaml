@@ -7,6 +7,7 @@ analyzer:
     - "**/*.config.dart"
     - "lib/core/l10n/app_localizations*.dart"
     - "lib/core/assets/assets.gen.dart"
+    - "bricks/**"
   errors:
     invalid_annotation_target: ignore
 

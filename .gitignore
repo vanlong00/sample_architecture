@@ -36,6 +36,7 @@ migrate_working_dir/
 # Mason (contains absolute local paths, regenerate via `mason get`)
 .mason/
 mason-lock.json
+bricks/*/hooks/build/
 
 # Symbolication related
 app.*.symbols
