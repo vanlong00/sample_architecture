@@ -85,6 +85,10 @@ flutter run -t lib/main_prod.dart    --flavor prod
 
 `baseUrl` và các cờ được lấy qua `AppConfig` theo flavor — **không hard-code** trong feature. Secret thật (nếu cần) truyền qua `--dart-define`.
 
+**Android**: đã cấu hình `productFlavors` (`dev`/`staging`/`prod`) trong `android/app/build.gradle.kts` — mỗi flavor có `applicationIdSuffix` riêng (`.dev`/`.staging`, prod không suffix) và tên app riêng (`app_name` resValue), nên có thể cài song song 3 bản trên cùng thiết bị.
+
+**iOS**: chưa cấu hình flavor native (cần Xcode để tạo build configuration + scheme an toàn, môi trường hiện tại không có Xcode để kiểm tra). `flutter run -t lib/main_dev.dart --flavor dev` trên iOS sẽ báo lỗi cho tới khi việc này được làm trên máy Mac.
+
 ## Test
 
 ```bash
