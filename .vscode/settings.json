@@ -1,0 +1,29 @@
+{
+  // "dart.enableSdkFormatter": true,
+  // "editor.formatOnSave": true,
+  // "editor.codeActionsOnSave": {
+  //   "source.fixAll": true
+  // },
+  // "files.autoSave": "onFocusChange",
+  "dart.lineLength": 80,
+  "editor.rulers": [80],
+  // "dart.analysisExcludedFolders": [
+  //   "build/"
+  // ],
+  "files.exclude": {
+    "**/*.g.dart": true,
+    "**/*.freezed.dart": true,
+    "**/*.gr.dart": true,
+    "**/*.config.dart": true,
+    ".dart_tool": true,
+    "lib/core/assets/assets.gen.dart": true
+  },
+  // "flutterHotReloadOnSave": true,
+  // "dart.previewFlutterUiGuides": true,
+  // "dart.previewFlutterUiGuidesCustomTracking": true,
+  // "terminal.integrated.defaultProfile.osx": "zsh", // hoặc "bash" tùy shell đang dùng
+  // "dart.runPubGetOnPubspecChanges": true,
+  // "dart.checkForSdkUpdates": true,
+  // "workbench.iconTheme": "material-icon-theme",
+  // "workbench.colorTheme": "Default Dark+"
+}
