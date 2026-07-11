@@ -18,6 +18,10 @@ import 'package:sample_architecture/core/di/injector.dart' as _i1043;
 import 'package:sample_architecture/core/storage/hive_service.dart' as _i4;
 import 'package:sample_architecture/core/storage/secure_storage_service.dart'
     as _i983;
+import 'package:sample_architecture/features/settings/presentation/bloc/locale_cubit.dart'
+    as _i430;
+import 'package:sample_architecture/features/settings/presentation/bloc/theme_cubit.dart'
+    as _i617;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -35,6 +39,10 @@ extension GetItInjectableX on _i174.GetIt {
       () =>
           registerModule.secureStorageService(gh<_i558.FlutterSecureStorage>()),
     );
+    gh.factory<_i430.LocaleCubit>(
+      () => _i430.LocaleCubit(gh<_i4.HiveService>()),
+    );
+    gh.factory<_i617.ThemeCubit>(() => _i617.ThemeCubit(gh<_i4.HiveService>()));
     gh.lazySingleton<_i361.Dio>(
       () => registerModule.dio(
         gh<_i776.AppConfig>(),
