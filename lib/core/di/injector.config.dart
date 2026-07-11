@@ -15,6 +15,7 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:sample_architecture/core/config/app_config.dart' as _i776;
 import 'package:sample_architecture/core/di/injector.dart' as _i1043;
+import 'package:sample_architecture/core/router/app_router.dart' as _i515;
 import 'package:sample_architecture/core/storage/hive_service.dart' as _i4;
 import 'package:sample_architecture/core/storage/secure_storage_service.dart'
     as _i983;
@@ -41,6 +42,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.secureStorage,
     );
     gh.lazySingleton<_i4.HiveService>(() => registerModule.hiveService);
+    gh.lazySingleton<_i515.AppRouter>(() => _i515.AppRouter());
     gh.lazySingleton<_i983.SecureStorageService>(
       () =>
           registerModule.secureStorageService(gh<_i558.FlutterSecureStorage>()),
