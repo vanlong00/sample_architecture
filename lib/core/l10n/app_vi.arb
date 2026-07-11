@@ -1,0 +1,10 @@
+{
+  "@@locale": "vi",
+  "appTitle": "Sample Architecture",
+  "retry": "Thử lại",
+  "errorServer": "Lỗi máy chủ. Vui lòng thử lại.",
+  "errorNetwork": "Không có kết nối mạng.",
+  "errorCache": "Lỗi dữ liệu cục bộ.",
+  "errorUnauthorized": "Phiên đã hết hạn. Vui lòng đăng nhập lại.",
+  "errorUnknown": "Đã có lỗi xảy ra."
+}

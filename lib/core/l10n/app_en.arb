@@ -1,3 +1,10 @@
 {
-  "@@locale": "en"
+  "@@locale": "en",
+  "appTitle": "Sample Architecture",
+  "retry": "Retry",
+  "errorServer": "Server error. Please try again.",
+  "errorNetwork": "No internet connection.",
+  "errorCache": "Local data error.",
+  "errorUnauthorized": "Session expired. Please sign in again.",
+  "errorUnknown": "Something went wrong."
 }
