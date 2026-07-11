@@ -22,6 +22,8 @@ import 'package:sample_architecture/features/articles/data/datasources/articles_
     as _i42;
 import 'package:sample_architecture/features/articles/data/repositories/articles_repository.dart'
     as _i649;
+import 'package:sample_architecture/features/articles/presentation/bloc/articles_cubit.dart'
+    as _i282;
 import 'package:sample_architecture/features/settings/presentation/bloc/locale_cubit.dart'
     as _i430;
 import 'package:sample_architecture/features/settings/presentation/bloc/theme_cubit.dart'
@@ -58,6 +60,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i649.ArticlesRepository>(
       () => _i649.ArticlesRepositoryImpl(gh<_i42.ArticlesRemoteDataSource>()),
+    );
+    gh.factory<_i282.ArticlesCubit>(
+      () => _i282.ArticlesCubit(gh<_i649.ArticlesRepository>()),
     );
     return this;
   }
