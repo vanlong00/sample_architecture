@@ -11,8 +11,13 @@ class LocaleCubit extends Cubit<Locale> {
   static const _key = 'locale';
 
   static Locale _load(HiveService hive) {
-    final code = hive.read<String>(HiveBoxes.settings, _key) ?? 'en';
-    return Locale(code);
+    try {
+      final code = hive.read<String>(HiveBoxes.settings, _key) ?? 'en';
+      return Locale(code);
+    } catch (_) {
+      // Box not open yet (e.g. before Hive init in tests) — use default.
+      return const Locale('en');
+    }
   }
 
   void setLocale(Locale locale) {

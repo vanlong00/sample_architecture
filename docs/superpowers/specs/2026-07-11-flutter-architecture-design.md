@@ -148,7 +148,7 @@ Response ← ErrorInterceptor      (map HTTP status → Exception, xử lý 401)
 
 - API mô tả bằng interface Retrofit (`@RestApi`), sinh code client qua `build_runner`.
 - `baseUrl` lấy từ `AppConfig` (theo flavor) — không hard-code.
-- 401 → `ErrorInterceptor` phát tín hiệu để router điều hướng về màn login. **Bản đầu không làm token-refresh tự động** (giữ đơn giản; thêm sau nếu cần).
+- 401 → `ErrorInterceptor` map thành `UnauthorizedException` → `Failure.unauthorized()`, hiển thị thông báo hết phiên cho người dùng. **Bản đầu KHÔNG tự điều hướng về màn login và KHÔNG token-refresh tự động** (xem §12 — chưa có feature auth/login trong phạm vi; điều hướng login là việc mở rộng sau).
 
 ## 7. Environment / Flavor (dev / staging / prod)
 

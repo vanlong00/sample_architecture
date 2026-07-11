@@ -8,16 +8,16 @@ import 'routes.dart';
 
 @lazySingleton
 class AppRouter {
-  GoRouter get router => GoRouter(
-        initialLocation: Routes.articles,
-        routes: [
-          GoRoute(
-            path: Routes.articles,
-            builder: (context, state) => BlocProvider(
-              create: (_) => getIt<ArticlesCubit>(),
-              child: const ArticlesPage(),
-            ),
-          ),
-        ],
-      );
+  late final GoRouter router = GoRouter(
+    initialLocation: Routes.articles,
+    routes: [
+      GoRoute(
+        path: Routes.articles,
+        builder: (context, state) => BlocProvider(
+          create: (_) => getIt<ArticlesCubit>(),
+          child: const ArticlesPage(),
+        ),
+      ),
+    ],
+  );
 }

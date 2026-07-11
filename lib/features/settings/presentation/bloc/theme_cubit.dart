@@ -11,13 +11,18 @@ class ThemeCubit extends Cubit<ThemeMode> {
   static const _key = 'themeMode';
 
   static ThemeMode _load(HiveService hive) {
-    switch (hive.read<String>(HiveBoxes.settings, _key)) {
-      case 'light':
-        return ThemeMode.light;
-      case 'dark':
-        return ThemeMode.dark;
-      default:
-        return ThemeMode.system;
+    try {
+      switch (hive.read<String>(HiveBoxes.settings, _key)) {
+        case 'light':
+          return ThemeMode.light;
+        case 'dark':
+          return ThemeMode.dark;
+        default:
+          return ThemeMode.system;
+      }
+    } catch (_) {
+      // Box not open yet (e.g. before Hive init in tests) — use default.
+      return ThemeMode.system;
     }
   }
 

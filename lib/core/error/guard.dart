@@ -22,6 +22,8 @@ Future<Either<Failure, T>> guard<T>(Future<T> Function() body) async {
   }
 }
 
+// NOTE: keep this mapping in sync with the direct `on ...Exception` catches
+// in `guard` above — both translate the same Exception types to Failure.
 Failure _fromError(Object? error) {
   if (error is UnauthorizedException) return const Failure.unauthorized();
   if (error is NetworkException) return const Failure.network();

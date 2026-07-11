@@ -27,32 +27,20 @@ void main() {
     }
   });
 
-  // SKIPPED — genuine platform-channel wall, not a logic bug. Verified by
-  // running this test with a 90s external timeout: it hangs and is killed by
-  // flutter test's own watchdog ("did not complete") rather than failing
-  // fast.
+  // Previously skipped: App.build() eagerly resolves ThemeCubit/LocaleCubit
+  // via getIt, and both constructors used to call HiveService.read(...) ->
+  // Hive.box(...) synchronously, which threw because no Hive box was ever
+  // opened (Hive.initFlutter() never completes under plain `flutter test`,
+  // which has no path_provider platform channel). That left ArticlesCubit
+  // stuck in its initial/loading state and pumpAndSettle() never settled.
   //
-  // Why: configureDependencies(AppEnv.dev) registers the full DI graph fine
-  // even when Hive.initFlutter() throws, because registration happens
-  // BEFORE Hive init (see injector.dart and Task 6's injector_test.dart), so
-  // the try/catch below lets us get as far as pumping the real App widget.
-  // But App.build() eagerly resolves ThemeCubit/LocaleCubit via getIt, and
-  // both constructors synchronously call HiveService.read(...) ->
-  // Hive.box(...), which throws because no Hive box was ever opened
-  // (Hive.initFlutter() never completed under plain `flutter test`, which
-  // has no path_provider platform channel). That leaves ArticlesCubit stuck
-  // in its initial/loading state (CircularProgressIndicator perpetually
-  // animating), so tester.pumpAndSettle() never settles and the test hangs.
-  //
-  // Coverage of every layer already exists in Tasks 2-13 unit/widget tests
-  // (HiveService, ThemeCubit, LocaleCubit, ArticlesCubit, ArticlesPage,
-  // injector, router all tested independently with Hive/DI mocked or
-  // tolerated at their own layer). Run this as an integration test (e.g.
-  // `flutter test --tags integration` on a device/platform with real
-  // path_provider/Hive support) to exercise it end-to-end.
+  // Fixed by making ThemeCubit._load/LocaleCubit._load tolerate a missing
+  // Hive box (try/catch falling back to defaults), so the cubits construct
+  // fine even when Hive was never initialized. The remaining try/catch below
+  // around configureDependencies still tolerates the same Hive.initFlutter()
+  // platform-channel failure during DI setup.
   testWidgets(
     'app khoi dong va hien thi bai viet tu datasource (mock)',
-    skip: true,
     (tester) async {
       // configureDependencies registers AppConfig and calls getIt.init()
       // BEFORE `await getIt<HiveService>().init()`. Hive.initFlutter() needs
