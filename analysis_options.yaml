@@ -6,6 +6,7 @@ analyzer:
     - "**/*.freezed.dart"
     - "**/*.config.dart"
     - "lib/core/l10n/app_localizations*.dart"
+    - "lib/core/assets/assets.gen.dart"
   errors:
     invalid_annotation_target: ignore
 

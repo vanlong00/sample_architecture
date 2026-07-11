@@ -35,6 +35,7 @@ Quy tắc: **Cubit mặc định**; chỉ dùng **Bloc (event-driven)** cho lu�
 | Local storage | hive (cache) + flutter_secure_storage (token) |
 | Error handling | fpdart `Either<Failure, T>` |
 | i18n | flutter_localizations + arb (`en`, `vi`) |
+| Asset codegen | [flutter_gen](https://pub.dev/packages/flutter_gen) (`flutter_gen_runner`) — truy cập ảnh/font type-safe |
 | Môi trường | flavor `dev` / `staging` / `prod` |
 
 ## Cấu trúc thư mục
@@ -53,6 +54,7 @@ lib/
 │   ├── router/         # go_router (app_router.dart, routes.dart)
 │   ├── theme/          # AppTheme (light/dark, Material 3), AppColors
 │   ├── l10n/           # app_en.arb, app_vi.arb, l10n_ext.dart
+│   ├── assets/         # assets.gen.dart (sinh bởi flutter_gen — KHÔNG sửa tay)
 │   └── widgets/        # LoadingView, ErrorView (dùng chung)
 └── features/
     ├── settings/       # ThemeCubit + LocaleCubit (lưu Hive)
@@ -69,9 +71,11 @@ Yêu cầu: Flutter SDK 3.22+ (Dart 3.4+).
 
 ```bash
 flutter pub get
-flutter pub run build_runner build --delete-conflicting-outputs   # sinh Freezed / json / retrofit / injectable
+flutter pub run build_runner build --delete-conflicting-outputs   # sinh Freezed / json / retrofit / injectable / flutter_gen (asset)
 flutter gen-l10n                                            # sinh AppLocalizations
 ```
+
+**Asset (ảnh/font)**: đặt file vào `assets/images/` (đã khai báo trong `pubspec.yaml`), sau đó chạy lại `build_runner` để `flutter_gen` sinh `lib/core/assets/assets.gen.dart` — truy cập qua `Assets.images.xxx` thay vì hard-code chuỗi đường dẫn. Cấu hình `flutter_gen` (output path, loại trừ `.gitkeep`) nằm ở khối `flutter_gen:` trong `pubspec.yaml`.
 
 > Trên Windows, nếu có bản `dart` standalone cũ hơn nằm trước trong PATH (vd. `dart-sdk` cũ), lệnh `dart run build_runner ...` trần có thể lỗi âm thầm. Dùng `flutter pub run build_runner ...` để chắc chắn chạy đúng Dart SDK đi kèm Flutter.
 
@@ -114,7 +118,7 @@ Dùng `mocktail` + `bloc_test`. Mỗi lớp test độc lập: repository (mock 
 - Repository **không bao giờ** throw ra ngoài — luôn trả `Either`.
 - DI lifetime: DataSource + Repository = `@LazySingleton`; Cubit/Bloc = `@injectable` (factory, mỗi màn hình một instance).
 - Lỗi hiển thị cho người dùng đi qua `mapFailureToMessage` (đã localize) — không hiển thị message kỹ thuật thô.
-- File `*.freezed.dart`, `*.g.dart`, `*.config.dart` là code sinh — không sửa tay, không review.
+- File `*.freezed.dart`, `*.g.dart`, `*.config.dart`, `lib/core/assets/assets.gen.dart` là code sinh — không sửa tay, không review.
 
 ## Phạm vi bản đầu (YAGNI)
 

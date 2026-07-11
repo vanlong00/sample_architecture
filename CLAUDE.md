@@ -4,7 +4,7 @@ Hướng dẫn cho Claude Code khi làm việc trong repo này. Đọc file này
 
 ## Repo này là gì
 
-Khung kiến trúc Flutter (app quy mô vừa): **feature-first + Clean Architecture rút gọn** (2 lớp `data` / `presentation` mỗi feature, không có domain layer riêng). Stack: flutter_bloc + freezed, dio + retrofit, get_it + injectable, go_router, hive + flutter_secure_storage, fpdart. Chi tiết đầy đủ: [README.md](README.md) và spec trong `docs/superpowers/specs/`.
+Khung kiến trúc Flutter (app quy mô vừa): **feature-first + Clean Architecture rút gọn** (2 lớp `data` / `presentation` mỗi feature, không có domain layer riêng). Stack: flutter_bloc + freezed, dio + retrofit, get_it + injectable, go_router, hive + flutter_secure_storage, fpdart, [flutter_gen](https://pub.dev/packages/flutter_gen) (sinh code type-safe cho asset). Chi tiết đầy đủ: [README.md](README.md) và spec trong `docs/superpowers/specs/`.
 
 ## Lệnh thường dùng
 
@@ -40,8 +40,9 @@ State luôn là Freezed union đủ 4 nhánh: `initial / loading / success / fai
 3. **Không hard-code `baseUrl` / secret** trong feature — lấy qua `AppConfig` (DI theo env). Secret thật dùng `--dart-define`.
 4. **Lỗi cho người dùng** đi qua `mapFailureToMessage(failure, context.l10n)` — không hiển thị message kỹ thuật thô.
 5. **i18n**: text hiển thị lấy từ `context.l10n.xxx` (khai báo trong `lib/core/l10n/app_en.arb` + `app_vi.arb`). Không hard-code chuỗi UI.
-6. **TDD**: viết test fail trước → code tối thiểu cho pass → commit. Dùng `mocktail` + `bloc_test`.
-7. Đặt file test gương theo `lib/`: code ở `lib/features/x/...` → test ở `test/features/x/...`.
+6. **Asset**: ảnh/font đặt trong `assets/images/` (khai báo trong `pubspec.yaml`), tham chiếu qua `Assets.images.xxx` (sinh bởi `flutter_gen`, `lib/core/assets/assets.gen.dart`) — không hard-code đường dẫn asset dạng chuỗi.
+7. **TDD**: viết test fail trước → code tối thiểu cho pass → commit. Dùng `mocktail` + `bloc_test`.
+8. Đặt file test gương theo `lib/`: code ở `lib/features/x/...` → test ở `test/features/x/...`.
 
 ## File KHÔNG được sửa tay (code sinh)
 
@@ -51,6 +52,7 @@ Bỏ qua khi review, không chỉnh trực tiếp — sinh lại bằng `build_r
 - `*.g.dart`
 - `lib/core/di/injector.config.dart`
 - `lib/core/l10n/app_localizations*.dart` (sinh bởi `flutter gen-l10n`)
+- `lib/core/assets/assets.gen.dart` (sinh bởi `flutter_gen_runner` qua `build_runner`)
 
 Nếu cần đổi hành vi, sửa file nguồn (`*.dart` gốc / `.arb`) rồi chạy lại lệnh sinh.
 
