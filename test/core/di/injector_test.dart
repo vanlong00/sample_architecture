@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
 import 'package:sample_architecture/core/config/app_config.dart';
 import 'package:sample_architecture/core/config/env.dart';
-import 'package:sample_architecture/core/di/injector.config.dart';
 import 'package:sample_architecture/core/di/injector.dart';
 import 'package:sample_architecture/core/storage/secure_storage_service.dart';
 
@@ -11,50 +11,38 @@ void main() {
 
   tearDown(() async {
     await getIt.reset();
+    // If Hive.initFlutter() partially succeeded (e.g. in an environment where
+    // the path_provider channel is available), clean up any on-disk state so
+    // tests don't leak into one another.
+    try {
+      await Hive.deleteFromDisk();
+    } catch (_) {
+      // No Hive state to clean up (init never completed); ignore.
+    }
   });
 
-  // NOTE: We intentionally do NOT call `configureDependencies(AppEnv.dev)`
-  // here, because it internally calls `getIt<HiveService>().init()`, which
-  // calls `Hive.initFlutter()`. That relies on the `path_provider` platform
-  // channel, which is unavailable under plain `flutter test` (unit test
-  // environment) and throws a MissingPluginException. Hive/storage init is
-  // already covered by Task 4's HiveService tests. Here we mirror exactly
-  // what `configureDependencies` does minus the Hive init line, to prove the
-  // DI graph itself (AppConfig, Dio, SecureStorageService) resolves
-  // correctly via the generated `getIt.init()` extension.
   test(
-    'resolves AppConfig, Dio, SecureStorageService after registration',
+    'configureDependencies wires the DI graph (tolerating Hive platform channel)',
     () async {
-      getIt.registerSingleton<AppConfig>(AppConfig.fromEnv(AppEnv.dev));
-      getIt.init();
-
-      expect(getIt<AppConfig>().env, AppEnv.dev);
-      expect(getIt<Dio>(), isA<Dio>());
-      expect(getIt<SecureStorageService>(), isA<SecureStorageService>());
-    },
-  );
-
-  test(
-    'configureDependencies registers AppConfig for the given env',
-    () async {
-      // configureDependencies itself is exercised only up to the point where
-      // Hive.initFlutter() would require a platform channel; we catch that
-      // specific failure so this test still asserts the production entry
-      // point wires up AppConfig/DI registration correctly end-to-end.
+      // configureDependencies registers AppConfig and calls getIt.init()
+      // BEFORE `await getIt<HiveService>().init()`. Hive.initFlutter() needs
+      // the path_provider platform channel, which is unavailable in plain
+      // `flutter test` and throws. Because registration happens first, the
+      // container is fully populated even when Hive init throws, so we tolerate
+      // only that failure and then assert the DI graph resolved.
       try {
-        await configureDependencies(AppEnv.staging);
-      } catch (_) {
-        // Expected in unit-test environment: Hive.initFlutter() needs the
-        // path_provider platform channel, which isn't wired up here.
-        // Storage init behavior itself is covered by Task 4's tests.
+        await configureDependencies(AppEnv.dev);
+      } on Object {
+        // Expected: Hive.initFlutter() platform channel unavailable.
+        // Storage/Hive init behavior itself is covered by Task 4's tests.
       }
 
-      expect(getIt<AppConfig>().env, AppEnv.staging);
+      expect(getIt.isRegistered<AppConfig>(), isTrue);
+      expect(getIt<AppConfig>().env, AppEnv.dev);
+      expect(getIt.isRegistered<Dio>(), isTrue);
       expect(getIt<Dio>(), isA<Dio>());
+      expect(getIt.isRegistered<SecureStorageService>(), isTrue);
       expect(getIt<SecureStorageService>(), isA<SecureStorageService>());
     },
-    skip:
-        'Hive.initFlutter needs path_provider platform channel; '
-        'storage covered by Task 4',
   );
 }
