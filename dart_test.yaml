@@ -1,0 +1,3 @@
+tags:
+  integration:
+    skip: "needs platform channels (Hive/path_provider, secure_storage); run separately as an integration/device test"
