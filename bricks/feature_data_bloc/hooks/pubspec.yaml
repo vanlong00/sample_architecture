@@ -1,0 +1,6 @@
+name: feature_data_bloc_hooks
+publish_to: none
+environment:
+  sdk: ^3.4.0
+dependencies:
+  mason: ">=0.1.0-dev.57 <0.2.0"
