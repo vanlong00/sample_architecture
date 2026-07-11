@@ -18,6 +18,8 @@ import 'package:sample_architecture/core/di/injector.dart' as _i1043;
 import 'package:sample_architecture/core/storage/hive_service.dart' as _i4;
 import 'package:sample_architecture/core/storage/secure_storage_service.dart'
     as _i983;
+import 'package:sample_architecture/features/articles/data/datasources/articles_remote_datasource.dart'
+    as _i42;
 import 'package:sample_architecture/features/settings/presentation/bloc/locale_cubit.dart'
     as _i430;
 import 'package:sample_architecture/features/settings/presentation/bloc/theme_cubit.dart'
@@ -48,6 +50,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i776.AppConfig>(),
         gh<_i983.SecureStorageService>(),
       ),
+    );
+    gh.lazySingleton<_i42.ArticlesRemoteDataSource>(
+      () => _i42.ArticlesRemoteDataSource(gh<_i361.Dio>()),
     );
     return this;
   }
