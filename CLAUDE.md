@@ -74,6 +74,24 @@ features/<feature>/
 
 Sau khi tạo: thêm route trong `lib/core/router/app_router.dart`, rồi chạy `build_runner`.
 
+### Sinh feature mới bằng Mason (khuyến nghị thay vì copy tay)
+
+Repo có brick Mason local `feature_data_bloc` (`bricks/feature_data_bloc/`, đăng ký trong `mason.yaml`) sinh sẵn toàn bộ cấu trúc trên (data + presentation + test mirror) theo đúng mẫu `articles`. Thiết kế chi tiết: `docs/superpowers/specs/2026-07-11-mason-feature-brick-design.md`.
+
+```bash
+dart pub global activate mason_cli   # 1 lần
+mason get                            # resolve brick sau khi clone repo
+mason make feature_data_bloc         # trả lời prompt feature_name (số nhiều, vd: products) và entity_name (số ít, vd: product)
+```
+
+Sau khi generate, **luôn** làm tiếp các bước thủ công (brick không tự động patch các file này):
+1. Thêm route path vào `lib/core/router/routes.dart`.
+2. Thêm `GoRoute` cho `<Feature>Page` vào `lib/core/router/app_router.dart`.
+3. Chạy `flutter pub run build_runner build --delete-conflicting-outputs`.
+4. Điền logic/assertion thật vào test skeleton đã sinh (model chỉ có field mẫu `id`/`name` — sửa lại theo entity thật), rồi chạy `flutter test test/features/<feature>`.
+
+Nếu `bricks/feature_data_bloc/` **chưa tồn tại** trong lần làm việc hiện tại, hãy triển khai brick theo đúng spec ở trên trước khi dùng lệnh `mason make` (dùng skill `writing-plans` để lập kế hoạch nếu việc này chưa có plan).
+
 ## Định nghĩa "xong"
 
 Một thay đổi được coi là hoàn tất khi:
