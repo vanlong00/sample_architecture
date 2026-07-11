@@ -33,6 +33,12 @@ UI (Page)  →  Cubit/Bloc  →  Repository  →  DataSource  →  API / Hive
 
 State luôn là Freezed union đủ 4 nhánh: `initial / loading / success / failure`.
 
+### Pipeline lỗi network (3 file phối hợp)
+
+`ErrorInterceptor` (`lib/core/network/interceptors/error_interceptor.dart`) bắt `DioException` ở tầng dio, map status code → Exception cụ thể (401 → `UnauthorizedException`, không có response → `NetworkException`, còn lại → `ServerException`) rồi gắn vào `DioException.error`. `guard()` (`lib/core/error/guard.dart`) đọc `error.error` đó để map tiếp sang `Failure`. `failure_mapper.dart` map `Failure` → chuỗi đã localize qua `l10n`. Khi thêm loại lỗi mới: sửa cả 3 file (`exceptions.dart`, `guard.dart`, `failure_mapper.dart` + thêm key `.arb`), không chỉ một chỗ.
+
+`AuthInterceptor` tự gắn Bearer token từ `SecureStorageService` vào mọi request — feature code không tự set header Authorization.
+
 ## Quy ước bắt buộc tuân theo
 
 1. **DI lifetime**: DataSource + Repository = `@LazySingleton` (impl dùng `@LazySingleton(as: AbstractType)`); Cubit/Bloc = `@injectable` (factory). Sau khi thêm/sửa class có annotation DI, **phải** chạy `flutter pub run build_runner build --delete-conflicting-outputs`.
@@ -104,6 +110,10 @@ Một thay đổi được coi là hoàn tất khi:
 
 - Đây là **Windows**. Shell chính là PowerShell; Bash tool cũng dùng được cho lệnh POSIX. Đường dẫn dùng `/` trong lệnh Flutter/Dart.
 - Test dựa vào Hive/secure_storage cần platform channel — nếu môi trường CI không có, đánh dấu `skip`/`@Tags(['integration'])` và ghi chú (coverage logic đã có ở các unit test tách biệt).
+
+## Khởi tạo DI (thứ tự quan trọng)
+
+`configureDependencies(env)` trong `lib/core/di/injector.dart`: đăng ký `AppConfig` thủ công **trước** `getIt.init()` (vì các provider khác — vd. `Dio` — phụ thuộc `AppConfig` qua constructor injection trong `RegisterModule`), rồi gọi `getIt.init()` (sinh bởi injectable), sau đó `await getIt<HiveService>().init()` thủ công (Hive cần mở box async, không tự động qua annotation). Nếu thêm dependency mới cần khởi tạo async tương tự, làm theo mẫu `HiveService.init()`, không nhét vào constructor.
 
 ## Phạm vi hiện tại (đừng tự thêm nếu chưa được yêu cầu)
 
