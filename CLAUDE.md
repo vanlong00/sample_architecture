@@ -10,13 +10,15 @@ Khung kiến trúc Flutter (app quy mô vừa): **feature-first + Clean Architec
 
 ```bash
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs   # BẮT BUỘC chạy sau khi sửa Freezed/json/retrofit/injectable
+flutter pub run build_runner build --delete-conflicting-outputs   # BẮT BUỘC chạy sau khi sửa Freezed/json/retrofit/injectable
 flutter gen-l10n                                            # sau khi sửa file .arb
 flutter test                                               # chạy test
 flutter test <path>                                        # test một file/thư mục
 flutter analyze                                            # phân tích tĩnh (phải sạch trước khi coi là xong)
 flutter run -t lib/main_dev.dart --flavor dev              # chạy app (dev)
 ```
+
+> Dùng `flutter pub run build_runner ...` chứ không phải `dart run build_runner ...` trần: môi trường Windows có thể có một bản `dart` standalone cũ hơn (không tương thích) đứng trước trong PATH, khiến lệnh `dart run` lỗi âm thầm. `flutter pub run` luôn gọi đúng Dart SDK đi kèm Flutter.
 
 ## Luật vàng — luồng dữ liệu
 
@@ -33,7 +35,7 @@ State luôn là Freezed union đủ 4 nhánh: `initial / loading / success / fai
 
 ## Quy ước bắt buộc tuân theo
 
-1. **DI lifetime**: DataSource + Repository = `@LazySingleton` (impl dùng `@LazySingleton(as: AbstractType)`); Cubit/Bloc = `@injectable` (factory). Sau khi thêm/sửa class có annotation DI, **phải** chạy `build_runner`.
+1. **DI lifetime**: DataSource + Repository = `@LazySingleton` (impl dùng `@LazySingleton(as: AbstractType)`); Cubit/Bloc = `@injectable` (factory). Sau khi thêm/sửa class có annotation DI, **phải** chạy `flutter pub run build_runner build --delete-conflicting-outputs`.
 2. **Cubit mặc định**; chỉ dùng Bloc event-driven khi luồng nhiều sự kiện (form nhiều bước, search debounce).
 3. **Không hard-code `baseUrl` / secret** trong feature — lấy qua `AppConfig` (DI theo env). Secret thật dùng `--dart-define`.
 4. **Lỗi cho người dùng** đi qua `mapFailureToMessage(failure, context.l10n)` — không hiển thị message kỹ thuật thô.
