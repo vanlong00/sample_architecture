@@ -1,0 +1,14 @@
+name: feature_data_bloc
+description: Sinh 1 feature theo mẫu articles (data + presentation, Cubit/Freezed/Retrofit/Either)
+version: 0.1.0
+environment:
+  mason: ">=0.1.0-dev.57 <0.2.0"
+vars:
+  feature_name:
+    type: string
+    description: Tên feature, số nhiều, snake_case-able (vd articles, products)
+    prompt: "Tên feature (số nhiều, vd: products)"
+  entity_name:
+    type: string
+    description: Tên entity, số ít, dùng cho model class (vd article, product)
+    prompt: "Tên entity (số ít, vd: product)"
