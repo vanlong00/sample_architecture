@@ -1,10 +1,115 @@
 {
   "@@locale": "vi",
-  "appTitle": "Sample Architecture",
-  "retry": "Thử lại",
+  "appTitle": "Busmod",
   "errorServer": "Lỗi máy chủ. Vui lòng thử lại.",
   "errorNetwork": "Không có kết nối mạng.",
   "errorCache": "Lỗi dữ liệu cục bộ.",
   "errorUnauthorized": "Phiên đã hết hạn. Vui lòng đăng nhập lại.",
-  "errorUnknown": "Đã có lỗi xảy ra."
+  "errorUnknown": "Đã có lỗi xảy ra.",
+  "errorModNotAvailable": "Mod này không còn khả dụng",
+  "navHome": "Trang chủ",
+  "navSearch": "Tìm kiếm",
+  "navDownloaded": "Đã tải",
+  "navFavorites": "Yêu thích",
+  "navSettings": "Cài đặt",
+  "typeBus": "Xe buýt",
+  "typeTruck": "Xe tải",
+  "typeCar": "Ô tô",
+  "typeMap": "Bản đồ",
+  "sortPopular": "Phổ biến",
+  "sortNewest": "Mới nhất",
+  "filterTitle": "Bộ lọc",
+  "filterBodyType": "Kiểu thân xe",
+  "filterManufacturer": "Hãng sản xuất",
+  "filterCountry": "Quốc gia",
+  "filterAll": "Tất cả",
+  "filterApply": "Áp dụng",
+  "filterReset": "Đặt lại",
+  "searchHint": "Tìm kiếm mod",
+  "searchAllTypes": "Tất cả loại",
+  "searchEmpty": "Không tìm thấy mod nào",
+  "listEmpty": "Chưa có gì ở đây",
+  "detailSpecs": "Thông số kỹ thuật",
+  "detailDescription": "Mô tả",
+  "detailMoreFrom": "Thêm từ {name}",
+  "detailMoreLike": "Mod tương tự",
+  "ctaDownload": "Tải xuống",
+  "ctaDownloading": "Đang tải {percent}%",
+  "ctaCancel": "Hủy",
+  "ctaImport": "Nhập vào PBSU",
+  "ctaRedownload": "Tải lại",
+  "ctaFileMissing": "Thiếu tệp, hãy tải lại",
+  "importSent": "Đã gửi mod tới PBSU",
+  "importChooserHint": "Chọn PBSU để nhập mod này",
+  "importFailed": "Không thể nhập mod",
+  "pbsuMissingTitle": "Chưa cài đặt PBSU",
+  "pbsuMissingBody": "Hãy cài đặt Proton Bus Simulator Urbano để nhập mod.",
+  "pbsuOpenStore": "Mở Google Play",
+  "downloadedEmpty": "Chưa có mod nào được tải",
+  "downloadedTotal": "Tổng cộng: {size}",
+  "deleteConfirmTitle": "Xóa mod?",
+  "deleteConfirmBody": "Xóa \"{title}\" khỏi thiết bị?",
+  "delete": "Xóa",
+  "cancel": "Hủy",
+  "favoritesEmpty": "Chưa có mod yêu thích",
+  "settingsTheme": "Giao diện",
+  "themeSystem": "Theo hệ thống",
+  "themeLight": "Sáng",
+  "themeDark": "Tối",
+  "settingsLanguage": "Ngôn ngữ",
+  "settingsPro": "Nâng cấp Pro",
+  "settingsRestore": "Khôi phục giao dịch",
+  "settingsPrivacy": "Chính sách bảo mật",
+  "settingsTerms": "Điều khoản sử dụng",
+  "settingsVersion": "Phiên bản {v}",
+  "proTitle": "Busmod Pro",
+  "proBenefitNoAds": "Xóa toàn bộ quảng cáo",
+  "proSubscribe": "Đăng ký",
+  "proRestored": "Đã khôi phục giao dịch",
+  "proNothingToRestore": "Không có gì để khôi phục",
+  "proPurchaseFailed": "Giao dịch thất bại",
+  "adLabel": "Quảng cáo",
+  "retry": "Thử lại",
+  "favoriteRemove": "Xoá khỏi yêu thích",
+  "@detailMoreFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@ctaDownloading": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@downloadedTotal": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "@deleteConfirmBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@settingsVersion": {
+    "placeholders": {
+      "v": {
+        "type": "String"
+      }
+    }
+  },
+  "searchClear": "Xóa",
+  "proActive": "Bạn đang dùng Pro",
+  "favoriteAdd": "Thêm vào yêu thích",
+  "proPurchased": "Chào mừng bạn đến với Pro!",
+  "proStoreUnavailable": "Cửa hàng không khả dụng. Vui lòng thử lại sau.",
+  "proRestoreFailed": "Không thể khôi phục giao dịch. Vui lòng thử lại sau."
 }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sample_architecture/core/l10n/app_localizations.dart';
+import 'package:busmod/core/l10n/app_localizations.dart';
 import 'core/di/injector.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/favorites/presentation/bloc/favorites_cubit.dart';
+import 'features/premium/presentation/bloc/paywall_cubit.dart';
+import 'features/premium/presentation/bloc/pro_status_cubit.dart';
 import 'features/settings/presentation/bloc/locale_cubit.dart';
 import 'features/settings/presentation/bloc/theme_cubit.dart';
 
@@ -17,6 +20,10 @@ class App extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => getIt<ThemeCubit>()),
         BlocProvider(create: (_) => getIt<LocaleCubit>()),
+        BlocProvider(create: (_) => getIt<FavoritesCubit>()..load()),
+        BlocProvider(create: (_) => getIt<ProStatusCubit>()),
+        // One instance shared by Settings (restore) and PaywallPage.
+        BlocProvider(create: (_) => getIt<PaywallCubit>()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
@@ -28,8 +35,7 @@ class App extends StatelessWidget {
                 darkTheme: AppTheme.dark,
                 themeMode: themeMode,
                 locale: locale,
-                localizationsDelegates:
-                    AppLocalizations.localizationsDelegates,
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
                 supportedLocales: AppLocalizations.supportedLocales,
                 routerConfig: router,
               );

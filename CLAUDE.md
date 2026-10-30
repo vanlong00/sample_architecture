@@ -4,7 +4,7 @@ Hướng dẫn cho Claude Code khi làm việc trong repo này. Đọc file này
 
 ## Repo này là gì
 
-Khung kiến trúc Flutter (app quy mô vừa): **feature-first + Clean Architecture rút gọn** (2 lớp `data` / `presentation` mỗi feature, không có domain layer riêng). Stack: flutter_bloc + freezed, dio + retrofit, get_it + injectable, go_router, hive + flutter_secure_storage, fpdart, [flutter_gen](https://pub.dev/packages/flutter_gen) (sinh code type-safe cho asset). Chi tiết đầy đủ: [README.md](README.md) và spec trong `docs/superpowers/specs/`.
+Khung kiến trúc Flutter (app quy mô vừa): **feature-first + Clean Architecture rút gọn** (2 lớp `data` / `presentation` mỗi feature, không có domain layer riêng). Stack: flutter_bloc + freezed, dio + retrofit, get_it + injectable, go_router, Isar (`LocalStore` key-value + cache), fpdart, [flutter_gen](https://pub.dev/packages/flutter_gen) (sinh code type-safe cho asset). Chi tiết đầy đủ: [README.md](README.md) và spec trong `docs/superpowers/specs/`.
 
 ## Lệnh thường dùng
 
@@ -18,12 +18,12 @@ flutter analyze                                            # phân tích tĩnh (
 flutter run -t lib/main_dev.dart --flavor dev              # chạy app (dev)
 ```
 
-> Dùng `flutter pub run build_runner ...` chứ không phải `dart run build_runner ...` trần: môi trường Windows có thể có một bản `dart` standalone cũ hơn (không tương thích) đứng trước trong PATH, khiến lệnh `dart run` lỗi âm thầm. `flutter pub run` luôn gọi đúng Dart SDK đi kèm Flutter.
+> Dùng `flutter pub run build_runner ...` để luôn gọi đúng Dart SDK đi kèm Flutter. Git dep private (bitbucket) cần `GIT_TERMINAL_PROMPT=0` khi `flutter pub get` để không bị hỏi mật khẩu.
 
 ## Luật vàng — luồng dữ liệu
 
 ```
-UI (Page)  →  Cubit/Bloc  →  Repository  →  DataSource  →  API / Hive
+UI (Page)  →  Cubit/Bloc  →  Repository  →  DataSource  →  API / Isar
 ```
 
 - **DataSource** chỉ nói chuyện với **một** nguồn, **ném `Exception`** (ServerException/CacheException/…). Không biết `Failure` hay `Either`.
@@ -37,7 +37,7 @@ State luôn là Freezed union đủ 4 nhánh: `initial / loading / success / fai
 
 `ErrorInterceptor` (`lib/core/network/interceptors/error_interceptor.dart`) bắt `DioException` ở tầng dio, map status code → Exception cụ thể (401 → `UnauthorizedException`, không có response → `NetworkException`, còn lại → `ServerException`) rồi gắn vào `DioException.error`. `guard()` (`lib/core/error/guard.dart`) đọc `error.error` đó để map tiếp sang `Failure`. `failure_mapper.dart` map `Failure` → chuỗi đã localize qua `l10n`. Khi thêm loại lỗi mới: sửa cả 3 file (`exceptions.dart`, `guard.dart`, `failure_mapper.dart` + thêm key `.arb`), không chỉ một chỗ.
 
-`AuthInterceptor` tự gắn Bearer token từ `SecureStorageService` vào mọi request — feature code không tự set header Authorization.
+Không có auth: app không dùng token, không có `AuthInterceptor` / secure storage.
 
 ## Quy ước bắt buộc tuân theo
 
@@ -64,7 +64,7 @@ Nếu cần đổi hành vi, sửa file nguồn (`*.dart` gốc / `.arb`) rồi 
 
 ## Mẫu tham chiếu
 
-Feature `articles` (`lib/features/articles/`) là mẫu đầy đủ end-to-end. Khi thêm feature mới, **sao chép cấu trúc của `articles`**:
+Feature mẫu là `mods` (`lib/features/mods/`; `articles` của sample đã bị xóa). Các feature hiện có: `mods`, `downloads`, `favorites`, `premium`, `settings`, `splash` (trong `lib/features/`). Khi thêm feature mới, **sao chép cấu trúc của `mods`**:
 
 ```
 features/<feature>/
@@ -82,7 +82,7 @@ Sau khi tạo: thêm route trong `lib/core/router/app_router.dart`, rồi chạy
 
 ### Sinh feature mới bằng Mason (khuyến nghị thay vì copy tay)
 
-Repo có brick Mason local `feature_data_bloc` (`bricks/feature_data_bloc/`, đăng ký trong `mason.yaml`) sinh sẵn toàn bộ cấu trúc trên (data + presentation + test mirror) theo đúng mẫu `articles`. Thiết kế chi tiết: `docs/superpowers/specs/2026-07-11-mason-feature-brick-design.md`.
+Repo có brick Mason local `feature_data_bloc` (`bricks/feature_data_bloc/`, đăng ký trong `mason.yaml`) sinh sẵn toàn bộ cấu trúc trên (data + presentation + test mirror) theo cấu trúc mẫu (`mods`). Thiết kế chi tiết: `docs/superpowers/specs/2026-07-11-mason-feature-brick-design.md`.
 
 ```bash
 dart pub global activate mason_cli   # 1 lần
@@ -108,13 +108,32 @@ Một thay đổi được coi là hoàn tất khi:
 
 ## Lưu ý môi trường
 
-- Đây là **Windows**. Shell chính là PowerShell; Bash tool cũng dùng được cho lệnh POSIX. Đường dẫn dùng `/` trong lệnh Flutter/Dart.
-- Test dựa vào Hive/secure_storage cần platform channel — nếu môi trường CI không có, đánh dấu `skip`/`@Tags(['integration'])` và ghi chú (coverage logic đã có ở các unit test tách biệt).
+- Dev trên **macOS**, chỉ **Android** (flavors dev/staging/prod; minSdk 24, compileSdk 36). iOS không hỗ trợ.
+- Test dựa vào Isar/path_provider cần platform channel — nếu không có, đánh dấu `skip`/`@Tags(['integration'])` và ghi chú.
+- **Firebase là Phase 2** (chưa thêm package Firebase / google-services / crashlytics). **Phase 1 phân phối = chỉ Internal testing** trên Play Console.
 
 ## Khởi tạo DI (thứ tự quan trọng)
 
-`configureDependencies(env)` trong `lib/core/di/injector.dart`: đăng ký `AppConfig` thủ công **trước** `getIt.init()` (vì các provider khác — vd. `Dio` — phụ thuộc `AppConfig` qua constructor injection trong `RegisterModule`), rồi gọi `getIt.init()` (sinh bởi injectable), sau đó `await getIt<HiveService>().init()` thủ công (Hive cần mở box async, không tự động qua annotation). Nếu thêm dependency mới cần khởi tạo async tương tự, làm theo mẫu `HiveService.init()`, không nhét vào constructor.
+`configureDependencies(env)` trong `lib/core/di/injector.dart`: đăng ký `AppConfig` thủ công **trước** `getIt.init()` (vì các provider khác — vd. `Dio` — phụ thuộc `AppConfig` qua constructor injection trong `RegisterModule`), rồi gọi `getIt.init()` (sinh bởi injectable). Dependency cần khởi tạo async (vd. mở Isar của `LocalStore`, task T3) thì khởi tạo thủ công sau `getIt.init()`, không nhét vào constructor. `LocalStore` (Isar, `lib/core/storage/local_store.dart`) đã có và được `init()` ngay sau `getIt.init()`.
+
+## Ghi chú tích hợp
+
+- Router (`lib/core/router/app_router.dart`): `/` splash, shell 5 tab (`/home /search /downloads /favorites /settings`), `/mod/:sourceId` và `/pro` ở root navigator. `/pro` chỉ được push từ Settings.
+- Cubit toàn app (`lib/app.dart`): `ThemeCubit`, `LocaleCubit`, `FavoritesCubit`, `ProStatusCubit`, và MỘT `PaywallCubit` dùng chung (Settings restore + `PaywallPage`).
+- `SplashCubit` tự khởi động `AdsService.init()` và `SubscriptionService.initialize()`; đừng thêm init ở `bootstrap`.
+- `pubspec.yaml` có `dependency_overrides: html: 0.15.6` vì `flutter_html 3.0.0` không build với `html 0.15.7`; bỏ override khi flutter_html sửa.
+- `app_picker` hiện KHÔNG được dùng ở đâu (chờ quyết định giữ/bỏ); chưa xóa khỏi `pubspec.yaml`.
+- Test cả app: `test/helpers/app_test_setup.dart` (`setUpAppDi()` = DI thật + Isar tạm + fake network/ads/IAP).
+
+## Phase 2 — Firebase (to-do)
+
+- Thêm dependency Firebase (core, analytics, crashlytics, remote_config).
+- Sinh `firebase_options.dart` bằng `flutterfire configure`; thêm gradle plugins (google-services, crashlytics) + `google-services.json` theo flavor.
+- Viết thật `RemoteConfigService` và thân `Telemetry` (`lib/core/analytics/telemetry.dart`, hiện là stub).
+- Force-update gate.
+- Các analytics event còn thiếu.
+- `remoteconfig.template.json`.
 
 ## Phạm vi hiện tại (đừng tự thêm nếu chưa được yêu cầu)
 
-Cố ý CHƯA làm (YAGNI): token-refresh tự động, domain layer riêng (usecase/entity), Drift (SQLite). 401 hiện chỉ điều hướng về login.
+Cố ý CHƯA làm (YAGNI): token-refresh tự động, domain layer riêng (usecase/entity), Drift (SQLite).

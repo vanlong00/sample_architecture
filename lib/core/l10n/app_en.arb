@@ -1,10 +1,115 @@
 {
   "@@locale": "en",
-  "appTitle": "Sample Architecture",
-  "retry": "Retry",
+  "appTitle": "Busmod",
   "errorServer": "Server error. Please try again.",
   "errorNetwork": "No internet connection.",
   "errorCache": "Local data error.",
   "errorUnauthorized": "Session expired. Please sign in again.",
-  "errorUnknown": "Something went wrong."
+  "errorUnknown": "Something went wrong.",
+  "errorModNotAvailable": "This mod is no longer available",
+  "navHome": "Home",
+  "navSearch": "Search",
+  "navDownloaded": "Downloaded",
+  "navFavorites": "Favorites",
+  "navSettings": "Settings",
+  "typeBus": "Bus",
+  "typeTruck": "Truck",
+  "typeCar": "Car",
+  "typeMap": "Map",
+  "sortPopular": "Popular",
+  "sortNewest": "Newest",
+  "filterTitle": "Filters",
+  "filterBodyType": "Body type",
+  "filterManufacturer": "Manufacturer",
+  "filterCountry": "Country",
+  "filterAll": "All",
+  "filterApply": "Apply",
+  "filterReset": "Reset",
+  "searchHint": "Search mods",
+  "searchAllTypes": "All types",
+  "searchEmpty": "No mods found",
+  "listEmpty": "Nothing here yet",
+  "detailSpecs": "Specifications",
+  "detailDescription": "Description",
+  "detailMoreFrom": "More from {name}",
+  "detailMoreLike": "More like this",
+  "ctaDownload": "Download",
+  "ctaDownloading": "Downloading {percent}%",
+  "ctaCancel": "Cancel",
+  "ctaImport": "Import to PBSU",
+  "ctaRedownload": "Download again",
+  "ctaFileMissing": "File missing, download again",
+  "importSent": "Mod sent to PBSU",
+  "importChooserHint": "Choose PBSU to import this mod",
+  "importFailed": "Could not import the mod",
+  "pbsuMissingTitle": "PBSU not installed",
+  "pbsuMissingBody": "Install Proton Bus Simulator Urbano to import mods.",
+  "pbsuOpenStore": "Open Google Play",
+  "downloadedEmpty": "No downloaded mods",
+  "downloadedTotal": "Total: {size}",
+  "deleteConfirmTitle": "Delete mod?",
+  "deleteConfirmBody": "Delete \"{title}\" from your device?",
+  "delete": "Delete",
+  "cancel": "Cancel",
+  "favoritesEmpty": "No favorites yet",
+  "settingsTheme": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "settingsLanguage": "Language",
+  "settingsPro": "Go Pro",
+  "settingsRestore": "Restore purchases",
+  "settingsPrivacy": "Privacy policy",
+  "settingsTerms": "Terms of use",
+  "settingsVersion": "Version {v}",
+  "proTitle": "Busmod Pro",
+  "proBenefitNoAds": "Remove all ads",
+  "proSubscribe": "Subscribe",
+  "proRestored": "Purchases restored",
+  "proNothingToRestore": "Nothing to restore",
+  "proPurchaseFailed": "Purchase failed",
+  "adLabel": "Ad",
+  "retry": "Retry",
+  "favoriteRemove": "Remove from favorites",
+  "@detailMoreFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@ctaDownloading": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@downloadedTotal": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "@deleteConfirmBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@settingsVersion": {
+    "placeholders": {
+      "v": {
+        "type": "String"
+      }
+    }
+  },
+  "searchClear": "Clear",
+  "proActive": "You are Pro",
+  "favoriteAdd": "Add to favorites",
+  "proPurchased": "Welcome to Pro!",
+  "proStoreUnavailable": "Store unavailable. Try again later.",
+  "proRestoreFailed": "Could not restore purchases. Try again later."
 }

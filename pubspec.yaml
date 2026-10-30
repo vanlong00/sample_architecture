@@ -1,4 +1,4 @@
-name: sample_architecture
+name: busmod
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.12.2
+  sdk: ^3.12.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -42,12 +42,35 @@ dependencies:
   get_it: ^9.2.1
   injectable: ^3.0.0
   go_router: ^17.3.0
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
-  flutter_secure_storage: ^10.3.1
   fpdart: ^1.2.0
+  isar_community: ^3.3.2
+  isar_community_flutter_libs: ^3.3.2
+  path_provider: ^2.1.5
+  dio_cache_interceptor: ^4.0.7
+  http_cache_isar_store: ^3.1.0
+  cached_network_image: ^3.4.1
+  flutter_html: ^3.0.0
+  open_file: ^3.5.11
+  url_launcher: ^6.3.2
+  package_info_plus: ^10.2.1
+  bloc_concurrency: ^0.3.0
+  google_mobile_ads: ^9.1.0
+  yandex_mobileads: 8.6.0
+  in_app_purchase: ^3.3.0
+  in_app_purchase_android: 0.5.0
+  yandex_native_custom:
+    git:
+      url: https://bitbucket.org/pamobile/yandex_custom_native_ad.git
+      ref: e419b68
+  app_picker:
+    git:
+      url: https://bitbucket.org/pamobile/app_picker.git
   flutter_localizations:
     sdk: flutter
+
+# flutter_html 3.0.0 calls html's `matches`, which html 0.15.7 removed; stay on 0.15.6.
+dependency_overrides:
+  html: 0.15.6
 
 dev_dependencies:
   flutter_test:
@@ -67,12 +90,7 @@ dev_dependencies:
   bloc_test: ^10.0.0
   injectable_generator: ^3.0.2
   flutter_gen_runner: ^5.14.1
-  # hive_generator intentionally omitted: latest published version (2.0.1, 2023-08-13)
-  # is hard-pinned to source_gen ^1.0.0 / analyzer <7.0.0, which is incompatible with
-  # injectable_generator/retrofit_generator/json_serializable/bloc_test on this Dart SDK
-  # (they require source_gen ^4.x / analyzer >=8.0). See task-1-report.md for details;
-  # consider migrating to hive_ce_generator (Hive Community Edition fork) when Hive
-  # TypeAdapter codegen is needed.
+  isar_community_generator: ^3.3.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

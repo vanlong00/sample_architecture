@@ -101,14 +101,8 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Sample Architecture'**
+  /// **'Busmod'**
   String get appTitle;
-
-  /// No description provided for @retry.
-  ///
-  /// In en, this message translates to:
-  /// **'Retry'**
-  String get retry;
 
   /// No description provided for @errorServer.
   ///
@@ -139,6 +133,432 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong.'**
   String get errorUnknown;
+
+  /// No description provided for @errorModNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This mod is no longer available'**
+  String get errorModNotAvailable;
+
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get navSearch;
+
+  /// No description provided for @navDownloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded'**
+  String get navDownloaded;
+
+  /// No description provided for @navFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get navFavorites;
+
+  /// No description provided for @navSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navSettings;
+
+  /// No description provided for @typeBus.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus'**
+  String get typeBus;
+
+  /// No description provided for @typeTruck.
+  ///
+  /// In en, this message translates to:
+  /// **'Truck'**
+  String get typeTruck;
+
+  /// No description provided for @typeCar.
+  ///
+  /// In en, this message translates to:
+  /// **'Car'**
+  String get typeCar;
+
+  /// No description provided for @typeMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get typeMap;
+
+  /// No description provided for @sortPopular.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular'**
+  String get sortPopular;
+
+  /// No description provided for @sortNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest'**
+  String get sortNewest;
+
+  /// No description provided for @filterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get filterTitle;
+
+  /// No description provided for @filterBodyType.
+  ///
+  /// In en, this message translates to:
+  /// **'Body type'**
+  String get filterBodyType;
+
+  /// No description provided for @filterManufacturer.
+  ///
+  /// In en, this message translates to:
+  /// **'Manufacturer'**
+  String get filterManufacturer;
+
+  /// No description provided for @filterCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get filterCountry;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @filterApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get filterApply;
+
+  /// No description provided for @filterReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get filterReset;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search mods'**
+  String get searchHint;
+
+  /// No description provided for @searchAllTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'All types'**
+  String get searchAllTypes;
+
+  /// No description provided for @searchEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No mods found'**
+  String get searchEmpty;
+
+  /// No description provided for @listEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet'**
+  String get listEmpty;
+
+  /// No description provided for @detailSpecs.
+  ///
+  /// In en, this message translates to:
+  /// **'Specifications'**
+  String get detailSpecs;
+
+  /// No description provided for @detailDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get detailDescription;
+
+  /// No description provided for @detailMoreFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'More from {name}'**
+  String detailMoreFrom(String name);
+
+  /// No description provided for @detailMoreLike.
+  ///
+  /// In en, this message translates to:
+  /// **'More like this'**
+  String get detailMoreLike;
+
+  /// No description provided for @ctaDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get ctaDownload;
+
+  /// No description provided for @ctaDownloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading {percent}%'**
+  String ctaDownloading(int percent);
+
+  /// No description provided for @ctaCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get ctaCancel;
+
+  /// No description provided for @ctaImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import to PBSU'**
+  String get ctaImport;
+
+  /// No description provided for @ctaRedownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download again'**
+  String get ctaRedownload;
+
+  /// No description provided for @ctaFileMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'File missing, download again'**
+  String get ctaFileMissing;
+
+  /// No description provided for @importSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Mod sent to PBSU'**
+  String get importSent;
+
+  /// No description provided for @importChooserHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose PBSU to import this mod'**
+  String get importChooserHint;
+
+  /// No description provided for @importFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not import the mod'**
+  String get importFailed;
+
+  /// No description provided for @pbsuMissingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PBSU not installed'**
+  String get pbsuMissingTitle;
+
+  /// No description provided for @pbsuMissingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Install Proton Bus Simulator Urbano to import mods.'**
+  String get pbsuMissingBody;
+
+  /// No description provided for @pbsuOpenStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Google Play'**
+  String get pbsuOpenStore;
+
+  /// No description provided for @downloadedEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No downloaded mods'**
+  String get downloadedEmpty;
+
+  /// No description provided for @downloadedTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total: {size}'**
+  String downloadedTotal(String size);
+
+  /// No description provided for @deleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete mod?'**
+  String get deleteConfirmTitle;
+
+  /// No description provided for @deleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{title}\" from your device?'**
+  String deleteConfirmBody(String title);
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @favoritesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorites yet'**
+  String get favoritesEmpty;
+
+  /// No description provided for @settingsTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get settingsTheme;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsPro.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Pro'**
+  String get settingsPro;
+
+  /// No description provided for @settingsRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchases'**
+  String get settingsRestore;
+
+  /// No description provided for @settingsPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get settingsPrivacy;
+
+  /// No description provided for @settingsTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of use'**
+  String get settingsTerms;
+
+  /// No description provided for @settingsVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {v}'**
+  String settingsVersion(String v);
+
+  /// No description provided for @proTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Busmod Pro'**
+  String get proTitle;
+
+  /// No description provided for @proBenefitNoAds.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove all ads'**
+  String get proBenefitNoAds;
+
+  /// No description provided for @proSubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get proSubscribe;
+
+  /// No description provided for @proRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchases restored'**
+  String get proRestored;
+
+  /// No description provided for @proNothingToRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to restore'**
+  String get proNothingToRestore;
+
+  /// No description provided for @proPurchaseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase failed'**
+  String get proPurchaseFailed;
+
+  /// No description provided for @adLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ad'**
+  String get adLabel;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @favoriteRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from favorites'**
+  String get favoriteRemove;
+
+  /// No description provided for @searchClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get searchClear;
+
+  /// No description provided for @proActive.
+  ///
+  /// In en, this message translates to:
+  /// **'You are Pro'**
+  String get proActive;
+
+  /// No description provided for @favoriteAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to favorites'**
+  String get favoriteAdd;
+
+  /// No description provided for @proPurchased.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Pro!'**
+  String get proPurchased;
+
+  /// No description provided for @proStoreUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Store unavailable. Try again later.'**
+  String get proStoreUnavailable;
+
+  /// No description provided for @proRestoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not restore purchases. Try again later.'**
+  String get proRestoreFailed;
 }
 
 class _AppLocalizationsDelegate

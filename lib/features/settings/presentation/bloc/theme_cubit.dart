@@ -1,48 +1,50 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import '../../../../core/storage/hive_service.dart';
+import '../../../../core/analytics/telemetry.dart';
+import '../../../../core/storage/local_store.dart';
 
 @injectable
 class ThemeCubit extends Cubit<ThemeMode> {
-  ThemeCubit(this._hive) : super(_load(_hive));
+  ThemeCubit(this._store) : super(_load(_store));
 
-  final HiveService _hive;
+  final LocalStore _store;
   static const _key = 'themeMode';
 
-  static ThemeMode _load(HiveService hive) {
+  static ThemeMode _load(LocalStore store) {
+    String? stored;
     try {
-      switch (hive.read<String>(HiveBoxes.settings, _key)) {
-        case 'light':
-          return ThemeMode.light;
-        case 'dark':
-          return ThemeMode.dark;
-        default:
-          return ThemeMode.system;
-      }
-    } catch (_) {
-      // Box not open yet (e.g. before Hive init in tests) — use default.
-      return ThemeMode.system;
+      stored = store.read<String>(StoreBoxes.settings, _key);
+    } catch (e, s) {
+      // A bad stored value must not crash app start: fall back to the default.
+      recordError(e, s, reason: 'ThemeCubit.load');
+    }
+    switch (stored) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
     }
   }
 
   void toggle() {
-    final next = state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
-    _persist(next);
-    emit(next);
+    setMode(state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
   }
 
   void setMode(ThemeMode mode) {
-    _persist(mode);
+    if (mode == state) return;
+    unawaited(
+      _store
+          .write<String>(StoreBoxes.settings, _key, mode.name)
+          .catchError(
+            (Object e, StackTrace s) =>
+                recordError(e, s, reason: 'ThemeCubit.persist'),
+          ),
+    );
     emit(mode);
-  }
-
-  void _persist(ThemeMode mode) {
-    final value = switch (mode) {
-      ThemeMode.light => 'light',
-      ThemeMode.dark => 'dark',
-      ThemeMode.system => 'system',
-    };
-    _hive.write<String>(HiveBoxes.settings, _key, value);
   }
 }

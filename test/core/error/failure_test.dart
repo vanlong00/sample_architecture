@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sample_architecture/core/error/failure.dart';
+import 'package:busmod/core/error/failure.dart';
 
 void main() {
   test('Failure union phân biệt được các nhánh qua when', () {

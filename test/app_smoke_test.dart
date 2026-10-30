@@ -1,77 +1,95 @@
-@Tags(['integration'])
-library;
+import 'dart:io';
 
+import 'package:busmod/app.dart';
+import 'package:busmod/core/di/injector.dart';
+import 'package:busmod/core/router/app_router.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:sample_architecture/app.dart';
-import 'package:sample_architecture/core/config/env.dart';
-import 'package:sample_architecture/core/di/injector.dart';
-import 'package:sample_architecture/features/articles/data/datasources/articles_remote_datasource.dart';
-import 'package:sample_architecture/features/articles/data/models/article_model.dart';
 
-class MockRemote extends Mock implements ArticlesRemoteDataSource {}
+import 'helpers/app_test_setup.dart';
+import 'helpers/di_test_setup.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  late Directory dir;
+  setUp(() async => dir = await setUpAppDi());
+  tearDown(() => tearDownDi(dir));
 
-  tearDown(() async {
-    await getIt.reset();
-    // If Hive.initFlutter() partially succeeded (e.g. in an environment where
-    // the path_provider channel is available), clean up any on-disk state so
-    // tests don't leak into one another.
-    try {
-      await Hive.deleteFromDisk();
-    } catch (_) {
-      // No Hive state to clean up (init never completed); ignore.
-    }
+  Future<void> boot(WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(const App());
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> openTab(WidgetTester tester, String label) async {
+    await tester.tap(
+      find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text(label),
+      ),
+    );
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('splash -> home with 4 tabs and a card list', (tester) async {
+    await boot(tester);
+    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byType(Tab), findsNWidgets(4));
+    expect(find.text('Alpha Bus'), findsOneWidget);
   });
 
-  // Previously skipped: App.build() eagerly resolves ThemeCubit/LocaleCubit
-  // via getIt, and both constructors used to call HiveService.read(...) ->
-  // Hive.box(...) synchronously, which threw because no Hive box was ever
-  // opened (Hive.initFlutter() never completes under plain `flutter test`,
-  // which has no path_provider platform channel). That left ArticlesCubit
-  // stuck in its initial/loading state and pumpAndSettle() never settled.
-  //
-  // Fixed by making ThemeCubit._load/LocaleCubit._load tolerate a missing
-  // Hive box (try/catch falling back to defaults), so the cubits construct
-  // fine even when Hive was never initialized. The remaining try/catch below
-  // around configureDependencies still tolerates the same Hive.initFlutter()
-  // platform-channel failure during DI setup.
-  testWidgets(
-    'app khoi dong va hien thi bai viet tu datasource (mock)',
-    (tester) async {
-      // configureDependencies registers AppConfig and calls getIt.init()
-      // BEFORE `await getIt<HiveService>().init()`. Hive.initFlutter() needs
-      // the path_provider platform channel, which is unavailable in plain
-      // `flutter test` and throws. Because registration happens first, the
-      // DI container is fully populated even when Hive init throws, so we
-      // tolerate only that failure here (same approach as Task 6's
-      // injector_test.dart) and then proceed to override the datasource and
-      // pump the real App widget.
-      try {
-        await configureDependencies(AppEnv.dev);
-      } on Object {
-        // Expected: Hive.initFlutter() platform channel unavailable in
-        // plain `flutter test`. Storage/Hive init behavior itself is
-        // covered by Task 4's tests.
-      }
+  testWidgets('bottom nav reaches all 5 tabs', (tester) async {
+    await boot(tester);
 
-      // Override the remote datasource with a mock so the app never touches
-      // the network (or the Dio/AuthInterceptor/secure_storage chain, since
-      // the mock bypasses Dio entirely).
-      final mock = MockRemote();
-      when(() => mock.getArticles()).thenAnswer(
-        (_) async => const [Article(id: 1, title: 'Smoke', body: 'ok')],
-      );
-      getIt.unregister<ArticlesRemoteDataSource>();
-      getIt.registerFactory<ArticlesRemoteDataSource>(() => mock);
+    await openTab(tester, 'Search');
+    expect(find.text('Search mods'), findsWidgets);
 
-      await tester.pumpWidget(const App());
-      await tester.pumpAndSettle();
+    await openTab(tester, 'Downloaded');
+    expect(find.text('No downloaded mods'), findsOneWidget);
 
-      expect(find.text('Smoke'), findsOneWidget);
-    },
-  );
+    await openTab(tester, 'Favorites');
+    expect(find.text('No favorites yet'), findsOneWidget);
+
+    await openTab(tester, 'Settings');
+    expect(find.text('Go Pro'), findsOneWidget);
+
+    await openTab(tester, 'Home');
+    expect(find.text('Alpha Bus'), findsOneWidget);
+  });
+
+  testWidgets('card tap opens detail without nav bar; back returns', (
+    tester,
+  ) async {
+    await boot(tester);
+    await tester.tap(find.text('Alpha Bus'));
+    await tester.pumpAndSettle();
+    expect(find.text('Detail 11'), findsWidgets);
+    expect(find.byType(NavigationBar), findsNothing);
+
+    getIt<AppRouter>().router.pop();
+    await tester.pumpAndSettle();
+    expect(find.byType(NavigationBar), findsOneWidget);
+  });
+
+  testWidgets('bad mod id redirects to home', (tester) async {
+    await boot(tester);
+    getIt<AppRouter>().router.go('/mod/abc');
+    await tester.pumpAndSettle();
+    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.text('Alpha Bus'), findsOneWidget);
+  });
+
+  testWidgets('settings Pro tile pushes paywall and back', (tester) async {
+    await boot(tester);
+    await openTab(tester, 'Settings');
+    await tester.tap(find.text('Go Pro'));
+    await tester.pumpAndSettle();
+    expect(find.text('Busmod Pro'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+
+    getIt<AppRouter>().router.pop();
+    await tester.pumpAndSettle();
+    expect(find.text('Go Pro'), findsOneWidget);
+  });
 }

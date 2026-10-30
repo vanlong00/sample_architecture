@@ -9,9 +9,14 @@ class LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
-    dev.log('<-- ${response.statusCode} ${response.requestOptions.uri}',
-        name: 'HTTP');
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
+    dev.log(
+      '<-- ${response.statusCode} ${response.requestOptions.uri}',
+      name: 'HTTP',
+    );
     handler.next(response);
   }
 }
