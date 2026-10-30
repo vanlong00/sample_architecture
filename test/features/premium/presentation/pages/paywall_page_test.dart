@@ -198,6 +198,10 @@ void main() {
 
   for (final (state, text) in [
     (const PaywallState.info('x'), 'Nothing to restore'),
+    (
+      const PaywallState.pending(),
+      'Your payment is pending. Pro will unlock when it is confirmed.',
+    ),
     (const PaywallState.error('boom'), 'Purchase failed'),
     (
       const PaywallState.error('boom', fromRestore: true),
@@ -213,6 +217,21 @@ void main() {
       expect(find.text('boom'), findsNothing);
     });
   }
+
+  testWidgets('pending: Subscribe and Restore enabled, no spinner', (t) async {
+    whenListen(
+      paywall,
+      stream.stream,
+      initialState: const PaywallState.pending(),
+    );
+    await pump(t);
+    expect(subscribeButton(t).onPressed, isNotNull);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    await t.tap(find.text('Subscribe'));
+    await t.tap(find.text('Restore purchases'));
+    verify(() => paywall.startPlan(SubscriptionPlan.monthly)).called(1);
+    verify(() => paywall.restore()).called(1);
+  });
 
   testWidgets('idle shows no snackbar', (t) async {
     await pump(t);

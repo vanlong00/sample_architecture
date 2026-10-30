@@ -27,6 +27,7 @@ class SettingsPage extends StatelessWidget {
           s is PaywallPurchased ||
           s is PaywallRestored ||
           s is PaywallInfo ||
+          s is PaywallPending ||
           s is PaywallError,
       listener: (context, state) {
         // The paywall page (pushed on top) handles its own feedback.
@@ -38,6 +39,8 @@ class SettingsPage extends StatelessWidget {
             context.showAppSnackBar(l10n.proRestored);
           case PaywallInfo():
             context.showAppSnackBar(l10n.proNothingToRestore);
+          case PaywallPending():
+            context.showAppSnackBar(l10n.proPending);
           case PaywallError():
             context.showAppSnackBar(
               state.fromRestore

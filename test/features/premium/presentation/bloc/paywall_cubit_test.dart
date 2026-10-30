@@ -69,6 +69,33 @@ void main() {
   );
 
   blocTest<PaywallCubit, PaywallState>(
+    'pending leaves purchasing (non-blocking), then purchased',
+    build: () => PaywallCubit(service),
+    act: (c) async {
+      await c.startPlan(SubscriptionPlan.monthly);
+      results.add(const SubscriptionPurchaseResult.pending());
+      await Future<void>.delayed(Duration.zero);
+      expect(c.state, isNot(isA<PaywallPurchasing>()));
+      expect(c.state, isNot(isA<PaywallRestoring>()));
+      await c.startPlan(SubscriptionPlan.monthly); // Subscribe works again
+      await c.restore();
+      results.add(const SubscriptionPurchaseResult.purchased());
+    },
+    wait: Duration.zero,
+    expect: () => [
+      const PaywallState.purchasing(),
+      const PaywallState.pending(),
+      const PaywallState.purchasing(),
+      const PaywallState.restoring(),
+      const PaywallState.purchased(),
+    ],
+    verify: (_) {
+      verify(() => service.buy(SubscriptionPlan.monthly)).called(2);
+      verify(() => service.restore()).called(1);
+    },
+  );
+
+  blocTest<PaywallCubit, PaywallState>(
     'buy throwing emits error instead of hanging',
     setUp: () => when(() => service.buy(any())).thenThrow(StateError('x')),
     build: () => PaywallCubit(service),

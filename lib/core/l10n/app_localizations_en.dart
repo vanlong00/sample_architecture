@@ -221,6 +221,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get proNothingToRestore => 'Nothing to restore';
 
   @override
+  String get proPending =>
+      'Your payment is pending. Pro will unlock when it is confirmed.';
+
+  @override
   String get proPurchaseFailed => 'Purchase failed';
 
   @override

@@ -189,6 +189,62 @@ void main() {
     await service.dispose();
   });
 
+  group('pending purchase', () {
+    PurchaseDetails pendingPurchase() =>
+        _purchase(PurchaseStatus.pending)..pendingCompletePurchase = true;
+
+    setUp(() {
+      when(
+        () => iap.queryProductDetails(any()),
+      ).thenAnswer((_) async => _monthlyResponse());
+      when(
+        () => iap.buyNonConsumable(purchaseParam: any(named: 'purchaseParam')),
+      ).thenAnswer((_) async => true);
+    });
+
+    test('after buy() emits pending, no grant, not completed; then purchased '
+        'grants removeAds, announces and completes', () async {
+      final service = build();
+      await service.initialize();
+      await service.buy(SubscriptionPlan.monthly);
+      final results = <SubscriptionPurchaseResult>[];
+      final sub = service.purchaseResultStream.listen(results.add);
+
+      purchases.add([pendingPurchase()]);
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(results, [isA<PurchasePending>()]);
+      expect(service.isPremium, isFalse);
+      verifyNever(() => ads.setRemoveAds(true));
+      verifyNever(() => iap.completePurchase(any()));
+
+      purchases.add([
+        _purchase(PurchaseStatus.purchased)..pendingCompletePurchase = true,
+      ]);
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(results, [isA<PurchasePending>(), isA<PurchaseSucceeded>()]);
+      expect(service.isPremium, isTrue);
+      verify(() => ads.setRemoveAds(true)).called(1);
+      verify(() => iap.completePurchase(any())).called(1);
+      await sub.cancel();
+      await service.dispose();
+    });
+
+    test('a pending purchase replayed at launch stays silent', () async {
+      when(() => iap.restorePurchases()).thenAnswer((_) async {
+        purchases.add([pendingPurchase()]);
+      });
+      final service = build();
+      final results = <SubscriptionPurchaseResult>[];
+      final sub = service.purchaseResultStream.listen(results.add);
+      await service.initialize();
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(results, isEmpty);
+      verifyNever(() => iap.completePurchase(any()));
+      await sub.cancel();
+      await service.dispose();
+    });
+  });
+
   group('plans and buy', () {
     setUp(() {
       when(

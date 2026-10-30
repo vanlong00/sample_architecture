@@ -77,6 +77,8 @@ class PaywallCubit extends Cubit<PaywallState> {
         emit(const PaywallState.purchased());
       case PurchaseRestored():
         emit(const PaywallState.restored());
+      case PurchasePending():
+        emit(const PaywallState.pending());
       case PurchaseCanceled():
         emit(const PaywallState.idle());
       case PurchaseFailed(:final message):

@@ -193,4 +193,31 @@ void main() {
       await c.close();
     },
   );
+
+  test('a pending payment unblocks the paywall, then purchased grants Pro '
+      'and announces', () async {
+    when(
+      () => iap.buyNonConsumable(purchaseParam: any(named: 'purchaseParam')),
+    ).thenAnswer((_) async {
+      purchases.add([_purchase(PurchaseStatus.pending)]);
+      return true;
+    });
+
+    await cubit.startPlan(SubscriptionPlan.monthly);
+    await settle();
+
+    expect(states, [
+      const PaywallState.purchasing(),
+      const PaywallState.pending(),
+    ]);
+    expect(service.isPremium, isFalse);
+    verifyNever(() => ads.setRemoveAds(true));
+
+    purchases.add([_purchase(PurchaseStatus.purchased)]);
+    await settle();
+
+    expect(states.last, const PaywallState.purchased());
+    expect(service.isPremium, isTrue);
+    verify(() => ads.setRemoveAds(true)).called(1);
+  });
 }

@@ -55,13 +55,14 @@ extension PaywallStatePatterns on PaywallState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( PaywallIdle value)?  idle,TResult Function( PaywallPurchasing value)?  purchasing,TResult Function( PaywallRestoring value)?  restoring,TResult Function( PaywallPurchased value)?  purchased,TResult Function( PaywallRestored value)?  restored,TResult Function( PaywallError value)?  error,TResult Function( PaywallInfo value)?  info,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( PaywallIdle value)?  idle,TResult Function( PaywallPurchasing value)?  purchasing,TResult Function( PaywallRestoring value)?  restoring,TResult Function( PaywallPending value)?  pending,TResult Function( PaywallPurchased value)?  purchased,TResult Function( PaywallRestored value)?  restored,TResult Function( PaywallError value)?  error,TResult Function( PaywallInfo value)?  info,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case PaywallIdle() when idle != null:
 return idle(_that);case PaywallPurchasing() when purchasing != null:
 return purchasing(_that);case PaywallRestoring() when restoring != null:
-return restoring(_that);case PaywallPurchased() when purchased != null:
+return restoring(_that);case PaywallPending() when pending != null:
+return pending(_that);case PaywallPurchased() when purchased != null:
 return purchased(_that);case PaywallRestored() when restored != null:
 return restored(_that);case PaywallError() when error != null:
 return error(_that);case PaywallInfo() when info != null:
@@ -83,13 +84,14 @@ return info(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( PaywallIdle value)  idle,required TResult Function( PaywallPurchasing value)  purchasing,required TResult Function( PaywallRestoring value)  restoring,required TResult Function( PaywallPurchased value)  purchased,required TResult Function( PaywallRestored value)  restored,required TResult Function( PaywallError value)  error,required TResult Function( PaywallInfo value)  info,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( PaywallIdle value)  idle,required TResult Function( PaywallPurchasing value)  purchasing,required TResult Function( PaywallRestoring value)  restoring,required TResult Function( PaywallPending value)  pending,required TResult Function( PaywallPurchased value)  purchased,required TResult Function( PaywallRestored value)  restored,required TResult Function( PaywallError value)  error,required TResult Function( PaywallInfo value)  info,}){
 final _that = this;
 switch (_that) {
 case PaywallIdle():
 return idle(_that);case PaywallPurchasing():
 return purchasing(_that);case PaywallRestoring():
-return restoring(_that);case PaywallPurchased():
+return restoring(_that);case PaywallPending():
+return pending(_that);case PaywallPurchased():
 return purchased(_that);case PaywallRestored():
 return restored(_that);case PaywallError():
 return error(_that);case PaywallInfo():
@@ -107,13 +109,14 @@ return info(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( PaywallIdle value)?  idle,TResult? Function( PaywallPurchasing value)?  purchasing,TResult? Function( PaywallRestoring value)?  restoring,TResult? Function( PaywallPurchased value)?  purchased,TResult? Function( PaywallRestored value)?  restored,TResult? Function( PaywallError value)?  error,TResult? Function( PaywallInfo value)?  info,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( PaywallIdle value)?  idle,TResult? Function( PaywallPurchasing value)?  purchasing,TResult? Function( PaywallRestoring value)?  restoring,TResult? Function( PaywallPending value)?  pending,TResult? Function( PaywallPurchased value)?  purchased,TResult? Function( PaywallRestored value)?  restored,TResult? Function( PaywallError value)?  error,TResult? Function( PaywallInfo value)?  info,}){
 final _that = this;
 switch (_that) {
 case PaywallIdle() when idle != null:
 return idle(_that);case PaywallPurchasing() when purchasing != null:
 return purchasing(_that);case PaywallRestoring() when restoring != null:
-return restoring(_that);case PaywallPurchased() when purchased != null:
+return restoring(_that);case PaywallPending() when pending != null:
+return pending(_that);case PaywallPurchased() when purchased != null:
 return purchased(_that);case PaywallRestored() when restored != null:
 return restored(_that);case PaywallError() when error != null:
 return error(_that);case PaywallInfo() when info != null:
@@ -134,12 +137,13 @@ return info(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  idle,TResult Function()?  purchasing,TResult Function()?  restoring,TResult Function()?  purchased,TResult Function()?  restored,TResult Function( String message,  bool fromRestore)?  error,TResult Function( String message)?  info,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  idle,TResult Function()?  purchasing,TResult Function()?  restoring,TResult Function()?  pending,TResult Function()?  purchased,TResult Function()?  restored,TResult Function( String message,  bool fromRestore)?  error,TResult Function( String message)?  info,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case PaywallIdle() when idle != null:
 return idle();case PaywallPurchasing() when purchasing != null:
 return purchasing();case PaywallRestoring() when restoring != null:
-return restoring();case PaywallPurchased() when purchased != null:
+return restoring();case PaywallPending() when pending != null:
+return pending();case PaywallPurchased() when purchased != null:
 return purchased();case PaywallRestored() when restored != null:
 return restored();case PaywallError() when error != null:
 return error(_that.message,_that.fromRestore);case PaywallInfo() when info != null:
@@ -161,12 +165,13 @@ return info(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  idle,required TResult Function()  purchasing,required TResult Function()  restoring,required TResult Function()  purchased,required TResult Function()  restored,required TResult Function( String message,  bool fromRestore)  error,required TResult Function( String message)  info,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  idle,required TResult Function()  purchasing,required TResult Function()  restoring,required TResult Function()  pending,required TResult Function()  purchased,required TResult Function()  restored,required TResult Function( String message,  bool fromRestore)  error,required TResult Function( String message)  info,}) {final _that = this;
 switch (_that) {
 case PaywallIdle():
 return idle();case PaywallPurchasing():
 return purchasing();case PaywallRestoring():
-return restoring();case PaywallPurchased():
+return restoring();case PaywallPending():
+return pending();case PaywallPurchased():
 return purchased();case PaywallRestored():
 return restored();case PaywallError():
 return error(_that.message,_that.fromRestore);case PaywallInfo():
@@ -184,12 +189,13 @@ return info(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  idle,TResult? Function()?  purchasing,TResult? Function()?  restoring,TResult? Function()?  purchased,TResult? Function()?  restored,TResult? Function( String message,  bool fromRestore)?  error,TResult? Function( String message)?  info,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  idle,TResult? Function()?  purchasing,TResult? Function()?  restoring,TResult? Function()?  pending,TResult? Function()?  purchased,TResult? Function()?  restored,TResult? Function( String message,  bool fromRestore)?  error,TResult? Function( String message)?  info,}) {final _that = this;
 switch (_that) {
 case PaywallIdle() when idle != null:
 return idle();case PaywallPurchasing() when purchasing != null:
 return purchasing();case PaywallRestoring() when restoring != null:
-return restoring();case PaywallPurchased() when purchased != null:
+return restoring();case PaywallPending() when pending != null:
+return pending();case PaywallPurchased() when purchased != null:
 return purchased();case PaywallRestored() when restored != null:
 return restored();case PaywallError() when error != null:
 return error(_that.message,_that.fromRestore);case PaywallInfo() when info != null:
@@ -289,6 +295,38 @@ int get hashCode => runtimeType.hashCode;
 @override
 String toString() {
   return 'PaywallState.restoring()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class PaywallPending implements PaywallState {
+  const PaywallPending();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaywallPending);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'PaywallState.pending()';
 }
 
 

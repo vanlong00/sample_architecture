@@ -338,6 +338,12 @@ class SubscriptionService {
         case PurchaseStatus.canceled:
           _resultController.add(const SubscriptionPurchaseResult.canceled());
         case PurchaseStatus.pending:
+          // Announce only for a purchase this session started: a pending
+          // purchase replayed at launch stays silent. Never completed here;
+          // the later purchased update is announced (_userDriven stays true).
+          if (_userDriven) {
+            _resultController.add(const SubscriptionPurchaseResult.pending());
+          }
           continue; // not done: do not grant or complete
       }
       if (p.pendingCompletePurchase) {
