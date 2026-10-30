@@ -49,6 +49,22 @@ void main() {
       expect(find.text('Go Pro'), findsOneWidget);
     });
 
+    testWidgets('an explicit platform route cannot skip the splash', (
+      tester,
+    ) async {
+      tester.platformDispatcher.defaultRouteNameTestValue = '/mod/1';
+      addTearDown(tester.platformDispatcher.clearDefaultRouteNameTestValue);
+      await tester.pumpWidget(const App());
+      // Splash runs and lands on home; the detail route was never opened.
+      await tester.pumpAndSettle();
+      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(find.text('Detail 1'), findsNothing);
+      expect(
+        getIt<AppRouter>().router.routerDelegate.currentConfiguration.uri.path,
+        Routes.home,
+      );
+    });
+
     testWidgets('mod detail covers nav bar; bad id redirects home', (
       tester,
     ) async {

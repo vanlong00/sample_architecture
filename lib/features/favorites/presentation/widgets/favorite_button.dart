@@ -19,16 +19,15 @@ class FavoriteButton extends StatelessWidget {
       selector: (state) => state.isFavorite(mod.sourceId),
       builder: (context, isFavorite) {
         final label = isFavorite ? l10n.favoriteRemove : l10n.favoriteAdd;
-        return Semantics(
-          button: true,
-          label: label,
-          excludeSemantics: true,
-          child: IconButton(
-            tooltip: label,
-            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-            icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
-            onPressed: () => context.read<FavoritesCubit>().toggle(mod),
-          ),
+        // The tooltip is the accessible name; IconButton keeps its tap action
+        // and exposes the `selected` (toggled) state.
+        return IconButton(
+          tooltip: label,
+          isSelected: isFavorite,
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+          icon: const Icon(Icons.favorite_border),
+          selectedIcon: const Icon(Icons.favorite),
+          onPressed: () => context.read<FavoritesCubit>().toggle(mod),
         );
       },
     );

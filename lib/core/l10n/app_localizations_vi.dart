@@ -21,7 +21,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get errorCache => 'Lỗi dữ liệu cục bộ.';
 
   @override
-  String get errorUnauthorized => 'Phiên đã hết hạn. Vui lòng đăng nhập lại.';
+  String get errorUnauthorized =>
+      'Không có quyền truy cập. Vui lòng thử lại sau.';
 
   @override
   String get errorUnknown => 'Đã có lỗi xảy ra.';
@@ -230,7 +231,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get retry => 'Thử lại';
 
   @override
-  String get favoriteRemove => 'Xoá khỏi yêu thích';
+  String get favoriteRemove => 'Xóa khỏi yêu thích';
 
   @override
   String get searchClear => 'Xóa';
@@ -251,4 +252,28 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get proRestoreFailed =>
       'Không thể khôi phục giao dịch. Vui lòng thử lại sau.';
+
+  @override
+  String get ctaDownloadingUnknown => 'Đang tải…';
+
+  @override
+  String get filterActiveSemantics => 'Bộ lọc, đang bật';
+
+  @override
+  String modDownloadsCount(int count) {
+    return '$count lượt tải';
+  }
+
+  @override
+  String deleteModSemantics(String title) {
+    return 'Xóa $title';
+  }
+
+  @override
+  String favoriteRemoveSemantics(String title) {
+    return 'Xóa $title khỏi yêu thích';
+  }
+
+  @override
+  String get errorStorageFull => 'Bộ nhớ thiết bị không đủ dung lượng.';
 }

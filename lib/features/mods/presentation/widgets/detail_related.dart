@@ -65,7 +65,10 @@ class _RelatedCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         margin: const EdgeInsets.only(right: 12),
         child: InkWell(
-          onTap: () => context.push(Routes.modDetailOf(card.sourceId)),
+          // Replace, not push: a browse chain must not stack detail pages
+          // (each holds its own cubits and images); Back returns to the list.
+          onTap: () =>
+              context.pushReplacement(Routes.modDetailOf(card.sourceId)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

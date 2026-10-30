@@ -18,19 +18,69 @@ const _blockedTags = {
   'iframe',
 };
 
+// One `[\s/]*` (not `\s*/?\s*`): adjacent optional runs backtrack
+// quadratically on long whitespace.
 final _imgTag = RegExp(
-  r'''<\s*/?\s*img\b(?:"[^"]*"|'[^']*'|[^>"'])*>?''',
+  r'''<[\s/]*img\b(?:"[^"]*"|'[^']*'|[^>"'])*>?''',
   caseSensitive: false,
 );
 
-/// Removes every `<img>` tag. Loops so `<im<img>g>` cannot reassemble one.
+bool _isSpace(int c) =>
+    (c >= 9 && c <= 13) ||
+    c == 0x20 ||
+    c == 0xa0 ||
+    c == 0x1680 ||
+    (c >= 0x2000 && c <= 0x200a) ||
+    c == 0x2028 ||
+    c == 0x2029 ||
+    c == 0x202f ||
+    c == 0x205f ||
+    c == 0x3000 ||
+    c == 0xfeff;
+
+/// Removes every `<img>` tag in a single linear pass (the input is crawled
+/// third-party HTML and this runs on the UI thread).
+///
+/// Removing a tag can join the text around it into a new one (`<im<img>g>`).
+/// So the scan tracks the trailing chain of open fragments
+/// (`<[\s/]*i?m?` repeated, only a `<` may follow a fragment) and drops the
+/// whole chain together with a tag removed right after it.
 String sanitizeModHtml(String html) {
-  var out = html;
-  for (var prev = ''; prev != out;) {
-    prev = out;
-    out = out.replaceAll(_imgTag, '');
+  final out = <int>[];
+  var chain = -1; // start in [out] of the open fragment chain, or -1.
+  var live = false; // the last `<` is still an open fragment.
+  var state = 0; // 0: only spaces/slashes so far, 1: saw i, 2: saw im.
+  var i = 0;
+  while (i < html.length) {
+    final c = html.codeUnitAt(i);
+    if (c == 0x3c) {
+      final m = _imgTag.matchAsPrefix(html, i);
+      if (m != null) {
+        i = m.end;
+        if (chain >= 0) out.length = chain;
+        chain = -1;
+        live = false;
+        continue;
+      }
+      if (!live) chain = out.length;
+      live = true;
+      state = 0;
+    } else if (live) {
+      if (state == 0 && (_isSpace(c) || c == 0x2f)) {
+        // still only spaces/slashes
+      } else if (state == 0 && (c | 0x20) == 0x69) {
+        state = 1;
+      } else if (state == 1 && (c | 0x20) == 0x6d) {
+        state = 2;
+      } else {
+        live = false;
+        chain = -1;
+      }
+    }
+    out.add(c);
+    i++;
   }
-  return out;
+  return String.fromCharCodes(out);
 }
 
 /// The uri a description link may open, or null (non-http(s), relative,

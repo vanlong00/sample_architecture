@@ -166,5 +166,8 @@ void main() {
       ),
     ).called(1);
     expect(badge(t).isLabelVisible, isTrue);
+    final handle = t.ensureSemantics();
+    expect(find.bySemanticsLabel('Filters, active'), findsOneWidget);
+    handle.dispose();
   });
 }

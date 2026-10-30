@@ -1,3 +1,5 @@
+import 'dart:ui' show Tristate;
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:busmod/core/l10n/app_localizations.dart';
 import 'package:busmod/features/favorites/data/models/favorite_record.dart';
@@ -7,6 +9,7 @@ import 'package:busmod/features/favorites/presentation/widgets/favorite_button.d
 import 'package:busmod/features/mods/data/models/mod_detail.dart';
 import 'package:busmod/features/mods/data/models/mod_type.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -72,5 +75,30 @@ void main() {
     final size = t.getSize(find.byType(IconButton));
     expect(size.width, greaterThanOrEqualTo(48));
     expect(size.height, greaterThanOrEqualTo(48));
+  });
+
+  testWidgets('semantics: named, tappable, toggled; tapping via the tree '
+      'toggles', (t) async {
+    final handle = t.ensureSemantics();
+    await pump(
+      t,
+      const FavoritesState.success([
+        FavoriteRecord(
+          sourceId: 7,
+          title: 'Volvo',
+          type: ModType.truck,
+          savedAtMs: 1,
+        ),
+      ]),
+    );
+    final finder = find.semantics.byAction(SemanticsAction.tap);
+    final node = t.getSemantics(find.byType(IconButton));
+    expect(node.tooltip, 'Remove from favorites');
+    expect(node.flagsCollection.isButton, isTrue);
+    expect(node.flagsCollection.isSelected, Tristate.isTrue);
+    expect(node.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
+    t.semantics.tap(finder);
+    verify(() => cubit.toggle(mod)).called(1);
+    handle.dispose();
   });
 }

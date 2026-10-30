@@ -37,7 +37,7 @@ void main() {
 
     await t.tap(find.text('Volvo B7R'));
     expect(taps, 1);
-    await t.tap(find.byTooltip('Remove from favorites'));
+    await t.tap(find.byTooltip('Remove Volvo B7R from favorites'));
     expect(removes, 1);
     expect(taps, 1);
   });

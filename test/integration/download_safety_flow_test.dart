@@ -430,7 +430,7 @@ void main() {
       // Delete on the missing tile: confirm, record gone, other tile stays.
       final deleteBtn = find.descendant(
         of: find.ancestor(of: find.text('Mod 40'), matching: find.byType(Card)),
-        matching: find.byTooltip('Delete'),
+        matching: find.byTooltip('Delete Mod 40'),
       );
       await t.tap(deleteBtn);
       await t.pumpAndSettle();

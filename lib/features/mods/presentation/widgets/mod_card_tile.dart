@@ -99,17 +99,21 @@ class _Downloads extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          Icons.download_outlined,
-          size: 16,
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
-        const SizedBox(width: 2),
-        Text('$count', style: theme.textTheme.labelMedium),
-      ],
+    return Semantics(
+      label: context.l10n.modDownloadsCount(count),
+      excludeSemantics: true,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.download_outlined,
+            size: 16,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 2),
+          Text('$count', style: theme.textTheme.labelMedium),
+        ],
+      ),
     );
   }
 }

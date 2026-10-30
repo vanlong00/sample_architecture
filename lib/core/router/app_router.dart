@@ -34,6 +34,9 @@ class AppRouter {
   late final GoRouter router = GoRouter(
     navigatorKey: _rootKey,
     initialLocation: Routes.splash,
+    // Always start at the splash (ads/subscription/cache init run there), even
+    // when an explicit intent carries another route (`/mod/1`, `/pro`).
+    overridePlatformDefaultLocation: true,
     observers: telemetryObservers,
     routes: [
       GoRoute(

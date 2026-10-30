@@ -27,6 +27,25 @@ void main() {
     expect(manifest, isNot(contains('usesCleartextTraffic="true"')));
   });
 
+  test('no auto backup (mods/*.zip exceed the quota) and no deep links', () {
+    final manifest = read('android/app/src/main/AndroidManifest.xml');
+    expect(manifest, contains('android:allowBackup="false"'));
+    expect(
+      manifest,
+      contains(
+        'android:name="flutter_deeplinking_enabled"\n'
+        '              android:value="false"',
+      ),
+    );
+    for (final flavor in ['debug', 'profile']) {
+      expect(
+        read('android/app/src/$flavor/AndroidManifest.xml'),
+        isNot(contains('allowBackup')),
+        reason: flavor,
+      );
+    }
+  });
+
   test('only the dev flavor overrides it to allow cleartext', () {
     final dev = read('android/app/src/dev/res/xml/network_security_config.xml');
     expect(dev, contains('cleartextTrafficPermitted="true"'));
