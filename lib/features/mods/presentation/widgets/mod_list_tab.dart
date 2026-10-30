@@ -106,7 +106,13 @@ class _Header extends StatelessWidget {
                   smallSize: 8,
                   child: const Icon(Icons.tune),
                 ),
-                label: Text(l10n.filterTitle),
+                label: Semantics(
+                  label: filterActive
+                      ? l10n.filterActiveSemantics
+                      : l10n.filterTitle,
+                  excludeSemantics: true,
+                  child: Text(l10n.filterTitle),
+                ),
               ),
             ],
           ),

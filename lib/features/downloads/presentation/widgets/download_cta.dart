@@ -60,9 +60,13 @@ class _Checking extends StatelessWidget {
   Widget build(BuildContext context) => FilledButton(
     style: FilledButton.styleFrom(minimumSize: _buttonSize),
     onPressed: null,
-    child: const SizedBox.square(
+    // Named after the button it stands in for (disabled "Download").
+    child: SizedBox.square(
       dimension: 20,
-      child: CircularProgressIndicator(strokeWidth: 2),
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        semanticsLabel: context.l10n.ctaDownload,
+      ),
     ),
   );
 }
@@ -111,14 +115,24 @@ class _Progress extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         LinearProgressIndicator(value: known ? percent / 100 : null),
-        if (known)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          // Live region announced in 10% steps: the label only changes when
+          // the step does, so TalkBack is not spammed.
+          child: Semantics(
+            liveRegion: true,
+            excludeSemantics: true,
+            label: known
+                ? context.l10n.ctaDownloading(percent ~/ 10 * 10)
+                : context.l10n.ctaDownloadingUnknown,
             child: Text(
-              context.l10n.ctaDownloading(percent),
+              known
+                  ? context.l10n.ctaDownloading(percent)
+                  : context.l10n.ctaDownloadingUnknown,
               textAlign: TextAlign.center,
             ),
           ),
+        ),
         OutlinedButton(
           style: OutlinedButton.styleFrom(minimumSize: _buttonSize),
           onPressed: context.read<ModDownloadCubit>().cancel,

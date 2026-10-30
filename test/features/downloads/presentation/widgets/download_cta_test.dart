@@ -14,6 +14,7 @@ import 'package:busmod/features/mods/data/models/mod_card.dart';
 import 'package:busmod/features/mods/data/models/mod_detail.dart';
 import 'package:busmod/features/mods/data/models/mod_type.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
@@ -168,8 +169,43 @@ void main() {
       find.byType(LinearProgressIndicator),
     );
     expect(bar.value, isNull);
-    expect(find.textContaining('Downloading'), findsNothing);
+    expect(find.text('Downloading…'), findsOneWidget);
     expect(find.text('Cancel'), findsOneWidget);
+  });
+
+  testWidgets('downloading: live region announces in 10% steps only', (
+    t,
+  ) async {
+    final handle = t.ensureSemantics();
+    Future<SemanticsNode> node(int received) async {
+      await t.pumpWidget(const SizedBox()); // fresh BlocBuilder per state
+      await pump(
+        t,
+        ModDownloadState.downloading(received: received, total: 100),
+      );
+      return t.getSemantics(find.textContaining('Downloading'));
+    }
+
+    final a = await node(21);
+    expect(a.label, 'Downloading 20%');
+    expect(a.flagsCollection.isLiveRegion, isTrue);
+    expect((await node(29)).label, 'Downloading 20%');
+    expect((await node(30)).label, 'Downloading 30%');
+    handle.dispose();
+  });
+
+  testWidgets('checking spinner has an accessible name', (t) async {
+    final handle = t.ensureSemantics();
+    await pump(t, const ModDownloadState.checking());
+    expect(
+      t
+          .widget<CircularProgressIndicator>(
+            find.byType(CircularProgressIndicator),
+          )
+          .semanticsLabel,
+      'Download',
+    );
+    handle.dispose();
   });
 
   testWidgets(

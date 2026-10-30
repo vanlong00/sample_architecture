@@ -57,10 +57,9 @@ class FavoriteTile extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: onRemove,
-                    tooltip: l10n.favoriteRemove,
+                    tooltip: l10n.favoriteRemoveSemantics(record.title),
                     icon: Icon(
                       Icons.favorite,
-                      semanticLabel: l10n.favoriteRemove,
                       color: theme.colorScheme.primary,
                     ),
                   ),

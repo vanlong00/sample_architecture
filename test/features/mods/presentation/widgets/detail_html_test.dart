@@ -54,6 +54,45 @@ void main() {
       );
     });
 
+    test('reassembly through spaces, slashes and partial names', () {
+      for (final c in [
+        '<<img>img>',
+        '< <img> img>',
+        '</<img>img>',
+        '<i<img>mg>',
+        '<im<img>g>',
+        '<im<im<img>g>g>g',
+        '< im<img>g>',
+      ]) {
+        expect(
+          sanitizeModHtml('a${c}b').toLowerCase(),
+          isNot(matches(RegExp(r'<[\s/]*img'))),
+          reason: c,
+        );
+      }
+    });
+
+    test('hostile input is linear (200 KB under 200 ms each)', () {
+      final inputs = {
+        'lt-space': '<${' ' * 200000}',
+        'lt-space-repeat': '< ' * 100000,
+        'nested-reassembly': '${'<im' * 25000}<img>${'g>' * 25000}',
+        'unterminated-quote': '<img "' * 33000,
+        'attr-run': '<img ${'a ' * 100000}',
+        'img-spam': '<img>' * 40000,
+        'frag-spam': '< ${'i<img>' * 28000}',
+      };
+      for (final e in inputs.entries) {
+        final sw = Stopwatch()..start();
+        sanitizeModHtml(e.value);
+        expect(
+          sw.elapsedMilliseconds,
+          lessThan(200),
+          reason: '${e.key}: ${sw.elapsedMilliseconds} ms',
+        );
+      }
+    });
+
     test('keeps other markup and nested links', () {
       const html =
           '<p>hi <a href="https://x.com"><b>go</b> <img src="i"></a></p>';

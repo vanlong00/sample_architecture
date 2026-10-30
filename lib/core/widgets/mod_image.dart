@@ -27,11 +27,21 @@ class ModImage extends StatelessWidget {
         uri.host.isNotEmpty &&
         !isBlockedHost(uri);
     if (!loadable) return placeholder;
-    return CachedNetworkImage(
-      imageUrl: uri.toString(),
-      fit: BoxFit.cover,
-      placeholder: (_, _) => placeholder,
-      errorWidget: (_, _, _) => placeholder,
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+    // Decode/store at the displayed size, not the (often huge) source size.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final px = constraints.maxWidth * dpr;
+        final width = px.isFinite && px > 0 ? px.round() : null;
+        return CachedNetworkImage(
+          imageUrl: uri.toString(),
+          fit: BoxFit.cover,
+          memCacheWidth: width,
+          maxWidthDiskCache: width,
+          placeholder: (_, _) => placeholder,
+          errorWidget: (_, _, _) => placeholder,
+        );
+      },
     );
   }
 }

@@ -95,7 +95,7 @@ void main() {
 
   testWidgets('remove icon calls cubit.remove with id', (t) async {
     await pump(t, FavoritesState.success([rec(5)]));
-    await t.tap(find.byTooltip('Remove from favorites'));
+    await t.tap(find.byTooltip('Remove Mod 5 from favorites'));
     verify(() => cubit.remove(5)).called(1);
   });
 

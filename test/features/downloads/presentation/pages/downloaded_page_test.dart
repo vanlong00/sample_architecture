@@ -121,7 +121,7 @@ void main() {
   testWidgets('delete confirmed calls cubit.delete', (t) async {
     final r = rec(5);
     await pump(t, DownloadedState.success(records: [r], totalBytes: 1024));
-    await t.tap(find.byTooltip('Delete'));
+    await t.tap(find.byTooltip('Delete Mod 5'));
     await t.pumpAndSettle();
     expect(find.text('Delete mod?'), findsOneWidget);
     expect(find.text('Delete "Mod 5" from your device?'), findsOneWidget);
@@ -136,7 +136,7 @@ void main() {
       () => cubit.delete(any()),
     ).thenAnswer((_) async => left(const Failure.network()));
     await pump(t, DownloadedState.success(records: [r], totalBytes: 1024));
-    await t.tap(find.byTooltip('Delete'));
+    await t.tap(find.byTooltip('Delete Mod 5'));
     await t.pumpAndSettle();
     await t.tap(find.widgetWithText(TextButton, 'Delete'));
     await t.pumpAndSettle();
@@ -183,7 +183,7 @@ void main() {
 
   testWidgets('delete cancelled does not call cubit.delete', (t) async {
     await pump(t, DownloadedState.success(records: [rec(5)], totalBytes: 1024));
-    await t.tap(find.byTooltip('Delete'));
+    await t.tap(find.byTooltip('Delete Mod 5'));
     await t.pumpAndSettle();
     await t.tap(find.text('Cancel'));
     await t.pumpAndSettle();

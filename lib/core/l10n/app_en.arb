@@ -4,7 +4,7 @@
   "errorServer": "Server error. Please try again.",
   "errorNetwork": "No internet connection.",
   "errorCache": "Local data error.",
-  "errorUnauthorized": "Session expired. Please sign in again.",
+  "errorUnauthorized": "Access denied. Please try again later.",
   "errorUnknown": "Something went wrong.",
   "errorModNotAvailable": "This mod is no longer available",
   "navHome": "Home",
@@ -112,5 +112,32 @@
   "favoriteAdd": "Add to favorites",
   "proPurchased": "Welcome to Pro!",
   "proStoreUnavailable": "Store unavailable. Try again later.",
-  "proRestoreFailed": "Could not restore purchases. Try again later."
+  "proRestoreFailed": "Could not restore purchases. Try again later.",
+  "ctaDownloadingUnknown": "Downloading…",
+  "filterActiveSemantics": "Filters, active",
+  "modDownloadsCount": "{count} downloads",
+  "@modDownloadsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteModSemantics": "Delete {title}",
+  "@deleteModSemantics": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "favoriteRemoveSemantics": "Remove {title} from favorites",
+  "@favoriteRemoveSemantics": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "errorStorageFull": "Not enough storage space on your device."
 }

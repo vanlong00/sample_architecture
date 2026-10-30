@@ -89,10 +89,9 @@ class DownloadedTile extends StatelessWidget {
                       ),
                       IconButton(
                         onPressed: onDelete,
-                        tooltip: l10n.delete,
+                        tooltip: l10n.deleteModSemantics(record.title),
                         icon: Icon(
                           Icons.delete_outline,
-                          semanticLabel: l10n.delete,
                           color: theme.colorScheme.error,
                         ),
                       ),

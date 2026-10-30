@@ -51,4 +51,29 @@ void main() {
       'Mod này không còn khả dụng',
     );
   });
+
+  group('FileSystemException carried by Failure.unknown', () {
+    const full =
+        "FileSystemException: writeFrom failed, path = '/x/a.zip' "
+        '(OS Error: No space left on device, errno = 28)';
+    const other =
+        "FileSystemException: Cannot open file, path = '/x/a.zip' "
+        '(OS Error: Permission denied, errno = 13)';
+
+    test('ENOSPC -> errorStorageFull (en + vi)', () {
+      for (final l in [l10n, AppLocalizationsVi()]) {
+        expect(
+          mapFailureToMessage(const Failure.unknown(full), l),
+          l.errorStorageFull,
+        );
+      }
+    });
+
+    test('other file errors -> errorCache, never raw text', () {
+      expect(
+        mapFailureToMessage(const Failure.unknown(other), l10n),
+        l10n.errorCache,
+      );
+    });
+  });
 }

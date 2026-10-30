@@ -125,7 +125,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorUnauthorized.
   ///
   /// In en, this message translates to:
-  /// **'Session expired. Please sign in again.'**
+  /// **'Access denied. Please try again later.'**
   String get errorUnauthorized;
 
   /// No description provided for @errorUnknown.
@@ -565,6 +565,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not restore purchases. Try again later.'**
   String get proRestoreFailed;
+
+  /// No description provided for @ctaDownloadingUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading…'**
+  String get ctaDownloadingUnknown;
+
+  /// No description provided for @filterActiveSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters, active'**
+  String get filterActiveSemantics;
+
+  /// No description provided for @modDownloadsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} downloads'**
+  String modDownloadsCount(int count);
+
+  /// No description provided for @deleteModSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {title}'**
+  String deleteModSemantics(String title);
+
+  /// No description provided for @favoriteRemoveSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {title} from favorites'**
+  String favoriteRemoveSemantics(String title);
+
+  /// No description provided for @errorStorageFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough storage space on your device.'**
+  String get errorStorageFull;
 }
 
 class _AppLocalizationsDelegate

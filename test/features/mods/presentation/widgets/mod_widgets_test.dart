@@ -31,6 +31,9 @@ void main() {
     expect(find.textContaining('Bus'), findsOneWidget);
     expect(find.textContaining('5.0 MB'), findsOneWidget);
     expect(find.text('42'), findsOneWidget);
+    final handle = t.ensureSemantics();
+    expect(find.bySemanticsLabel(RegExp('42 downloads')), findsOneWidget);
+    handle.dispose();
     await t.tap(find.byType(ModCardTile));
     expect(taps, 1);
   });

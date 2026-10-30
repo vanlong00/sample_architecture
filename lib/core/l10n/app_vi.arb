@@ -4,7 +4,7 @@
   "errorServer": "Lỗi máy chủ. Vui lòng thử lại.",
   "errorNetwork": "Không có kết nối mạng.",
   "errorCache": "Lỗi dữ liệu cục bộ.",
-  "errorUnauthorized": "Phiên đã hết hạn. Vui lòng đăng nhập lại.",
+  "errorUnauthorized": "Không có quyền truy cập. Vui lòng thử lại sau.",
   "errorUnknown": "Đã có lỗi xảy ra.",
   "errorModNotAvailable": "Mod này không còn khả dụng",
   "navHome": "Trang chủ",
@@ -71,7 +71,7 @@
   "proPurchaseFailed": "Giao dịch thất bại",
   "adLabel": "Quảng cáo",
   "retry": "Thử lại",
-  "favoriteRemove": "Xoá khỏi yêu thích",
+  "favoriteRemove": "Xóa khỏi yêu thích",
   "@detailMoreFrom": {
     "placeholders": {
       "name": {
@@ -112,5 +112,32 @@
   "favoriteAdd": "Thêm vào yêu thích",
   "proPurchased": "Chào mừng bạn đến với Pro!",
   "proStoreUnavailable": "Cửa hàng không khả dụng. Vui lòng thử lại sau.",
-  "proRestoreFailed": "Không thể khôi phục giao dịch. Vui lòng thử lại sau."
+  "proRestoreFailed": "Không thể khôi phục giao dịch. Vui lòng thử lại sau.",
+  "ctaDownloadingUnknown": "Đang tải…",
+  "filterActiveSemantics": "Bộ lọc, đang bật",
+  "modDownloadsCount": "{count} lượt tải",
+  "@modDownloadsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteModSemantics": "Xóa {title}",
+  "@deleteModSemantics": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "favoriteRemoveSemantics": "Xóa {title} khỏi yêu thích",
+  "@favoriteRemoveSemantics": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "errorStorageFull": "Bộ nhớ thiết bị không đủ dung lượng."
 }

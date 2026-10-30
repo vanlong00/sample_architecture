@@ -21,7 +21,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorCache => 'Local data error.';
 
   @override
-  String get errorUnauthorized => 'Session expired. Please sign in again.';
+  String get errorUnauthorized => 'Access denied. Please try again later.';
 
   @override
   String get errorUnknown => 'Something went wrong.';
@@ -254,4 +254,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get proRestoreFailed =>
       'Could not restore purchases. Try again later.';
+
+  @override
+  String get ctaDownloadingUnknown => 'Downloading…';
+
+  @override
+  String get filterActiveSemantics => 'Filters, active';
+
+  @override
+  String modDownloadsCount(int count) {
+    return '$count downloads';
+  }
+
+  @override
+  String deleteModSemantics(String title) {
+    return 'Delete $title';
+  }
+
+  @override
+  String favoriteRemoveSemantics(String title) {
+    return 'Remove $title from favorites';
+  }
+
+  @override
+  String get errorStorageFull => 'Not enough storage space on your device.';
 }

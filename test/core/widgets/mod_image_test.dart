@@ -38,4 +38,23 @@ void main() {
     // Let the (failing, test-env) load settle into the error placeholder.
     await t.pump(const Duration(seconds: 1));
   });
+
+  testWidgets('decodes/stores at the displayed pixel width', (t) async {
+    await t.pumpWidget(
+      const MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 160,
+            height: 90,
+            child: ModImage(url: 'https://cdn.example.com/a.jpg'),
+          ),
+        ),
+      ),
+    );
+    final dpr = t.view.devicePixelRatio;
+    final img = t.widget<CachedNetworkImage>(find.byType(CachedNetworkImage));
+    expect(img.memCacheWidth, (160 * dpr).round());
+    expect(img.maxWidthDiskCache, (160 * dpr).round());
+    await t.pump(const Duration(seconds: 1));
+  });
 }

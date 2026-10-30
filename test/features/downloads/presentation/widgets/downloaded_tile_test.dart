@@ -46,7 +46,7 @@ void main() {
       ),
     );
     await t.tap(find.text('Import to PBSU'));
-    await t.tap(find.byTooltip('Delete'));
+    await t.tap(find.byTooltip('Delete Big Bus'));
     expect(imported, 1);
     expect(deleted, 1);
   });
@@ -68,7 +68,7 @@ void main() {
     );
     expect(find.text('File missing, download again'), findsOneWidget);
     await t.tap(find.text('Import to PBSU'), warnIfMissed: false);
-    await t.tap(find.byTooltip('Delete'));
+    await t.tap(find.byTooltip('Delete Big Bus'));
     expect(imported, 0);
     expect(deleted, 1);
   });
