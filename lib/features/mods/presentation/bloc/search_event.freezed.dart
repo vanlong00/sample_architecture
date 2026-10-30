@@ -128,14 +128,14 @@ return refresh(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String query)?  queryChanged,TResult Function( ModType? type)?  typeChanged,TResult Function()?  loadMore,TResult Function()?  retry,TResult Function()?  refresh,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String query)?  queryChanged,TResult Function( ModType? type)?  typeChanged,TResult Function()?  loadMore,TResult Function()?  retry,TResult Function( Completer<Failure?>? done)?  refresh,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case SearchQueryChanged() when queryChanged != null:
 return queryChanged(_that.query);case SearchTypeChanged() when typeChanged != null:
 return typeChanged(_that.type);case SearchLoadMore() when loadMore != null:
 return loadMore();case SearchRetry() when retry != null:
 return retry();case SearchRefresh() when refresh != null:
-return refresh();case _:
+return refresh(_that.done);case _:
   return orElse();
 
 }
@@ -153,14 +153,14 @@ return refresh();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String query)  queryChanged,required TResult Function( ModType? type)  typeChanged,required TResult Function()  loadMore,required TResult Function()  retry,required TResult Function()  refresh,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String query)  queryChanged,required TResult Function( ModType? type)  typeChanged,required TResult Function()  loadMore,required TResult Function()  retry,required TResult Function( Completer<Failure?>? done)  refresh,}) {final _that = this;
 switch (_that) {
 case SearchQueryChanged():
 return queryChanged(_that.query);case SearchTypeChanged():
 return typeChanged(_that.type);case SearchLoadMore():
 return loadMore();case SearchRetry():
 return retry();case SearchRefresh():
-return refresh();}
+return refresh(_that.done);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -174,14 +174,14 @@ return refresh();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String query)?  queryChanged,TResult? Function( ModType? type)?  typeChanged,TResult? Function()?  loadMore,TResult? Function()?  retry,TResult? Function()?  refresh,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String query)?  queryChanged,TResult? Function( ModType? type)?  typeChanged,TResult? Function()?  loadMore,TResult? Function()?  retry,TResult? Function( Completer<Failure?>? done)?  refresh,}) {final _that = this;
 switch (_that) {
 case SearchQueryChanged() when queryChanged != null:
 return queryChanged(_that.query);case SearchTypeChanged() when typeChanged != null:
 return typeChanged(_that.type);case SearchLoadMore() when loadMore != null:
 return loadMore();case SearchRetry() when retry != null:
 return retry();case SearchRefresh() when refresh != null:
-return refresh();case _:
+return refresh(_that.done);case _:
   return null;
 
 }
@@ -389,32 +389,66 @@ String toString() {
 
 
 class SearchRefresh implements SearchEvent {
-  const SearchRefresh();
+  const SearchRefresh([this.done]);
   
 
+ final  Completer<Failure?>? done;
 
-
+/// Create a copy of SearchEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SearchRefreshCopyWith<SearchRefresh> get copyWith => _$SearchRefreshCopyWithImpl<SearchRefresh>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchRefresh);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchRefresh&&(identical(other.done, done) || other.done == done));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,done);
 
 @override
 String toString() {
-  return 'SearchEvent.refresh()';
+  return 'SearchEvent.refresh(done: $done)';
 }
 
 
 }
 
+/// @nodoc
+abstract mixin class $SearchRefreshCopyWith<$Res> implements $SearchEventCopyWith<$Res> {
+  factory $SearchRefreshCopyWith(SearchRefresh value, $Res Function(SearchRefresh) _then) = _$SearchRefreshCopyWithImpl;
+@useResult
+$Res call({
+ Completer<Failure?>? done
+});
 
 
+
+
+}
+/// @nodoc
+class _$SearchRefreshCopyWithImpl<$Res>
+    implements $SearchRefreshCopyWith<$Res> {
+  _$SearchRefreshCopyWithImpl(this._self, this._then);
+
+  final SearchRefresh _self;
+  final $Res Function(SearchRefresh) _then;
+
+/// Create a copy of SearchEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? done = freezed,}) {
+  return _then(SearchRefresh(
+freezed == done ? _self.done : done // ignore: cast_nullable_to_non_nullable
+as Completer<Failure?>?,
+  ));
+}
+
+
+}
 
 // dart format on
