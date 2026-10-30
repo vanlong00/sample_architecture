@@ -9,7 +9,8 @@ import '../../data/repositories/download_repository.dart';
 import 'pbsu_missing_dialog.dart';
 
 /// Runs an import [action] and always tells the user how it went.
-/// [onFileMissing] fires when the file is gone from disk (`Left(cache)`).
+/// [onFileMissing] fires only when the file is verifiably gone from disk
+/// (`Right(fileMissing)`); a storage error is just a failed import.
 Future<void> runImport(
   BuildContext context,
   Future<Either<Failure, ImportOutcome>> Function() action, {
@@ -20,12 +21,7 @@ Future<void> runImport(
   final result = await action();
   if (!context.mounted) return;
   final l10n = context.l10n;
-  if (result case Left(value: CacheFailure())) {
-    context.showAppSnackBar(l10n.ctaFileMissing, isError: true);
-    onFileMissing?.call();
-    return;
-  }
-  // Any other Left means the file is unreadable: same message as failed.
+  // Any Left (a storage error included) is a failed import, not a missing file.
   final outcome = result.getOrElse((_) => ImportOutcome.failed);
   switch (outcome) {
     case ImportOutcome.sent:
@@ -36,6 +32,9 @@ Future<void> runImport(
       context.showAppSnackBar(l10n.importChooserHint);
     case ImportOutcome.failed:
       context.showAppSnackBar(l10n.importFailed, isError: true);
+    case ImportOutcome.fileMissing:
+      context.showAppSnackBar(l10n.ctaFileMissing, isError: true);
+      onFileMissing?.call();
   }
 }
 

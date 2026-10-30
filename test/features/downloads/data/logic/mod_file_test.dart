@@ -26,11 +26,26 @@ void main() {
   group('isAllowedStorageUrl (F1)', () {
     for (final url in [
       'https://cdn.x/mods/12.zip?sig=1',
-      'http://10.0.2.2/mods/12.rar',
       'https://cdn.x@cdn2.x/12.zip',
     ]) {
       test('allows $url', () => expect(isAllowedStorageUrl(url), isTrue));
     }
+    test('cleartext http: refused by default, allowed only with allowHttp', () {
+      const url = 'http://10.0.2.2/mods/12.rar';
+      expect(kAllowHttpStorage, isFalse); // secure unless defined at build
+      expect(isAllowedStorageUrl(url), isFalse);
+      expect(isAllowedStorageUrl(url, allowHttp: false), isFalse);
+      expect(isAllowedStorageUrl(url, allowHttp: true), isTrue);
+      // allowHttp never lets a blocked host or another scheme through
+      expect(
+        isAllowedStorageUrl('http://www.mediafire.com/a.zip', allowHttp: true),
+        isFalse,
+      );
+      expect(
+        isAllowedStorageUrl('ftp://cdn.x/a.zip', allowHttp: true),
+        isFalse,
+      );
+    });
     for (final url in <String?>[
       null,
       '',

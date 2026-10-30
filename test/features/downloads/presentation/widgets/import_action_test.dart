@@ -94,11 +94,25 @@ void main() {
     expect(find.text('Could not import the mod'), findsOneWidget);
   });
 
-  testWidgets('Left(cache) -> file missing snackbar and callback', (t) async {
+  testWidgets('fileMissing -> file missing snackbar and callback', (t) async {
     var missing = 0;
-    await run(t, left(const Failure.cache()), onFileMissing: () => missing++);
+    await run(
+      t,
+      right(ImportOutcome.fileMissing),
+      onFileMissing: () => missing++,
+    );
     expect(find.text('File missing, download again'), findsOneWidget);
     expect(missing, 1);
+  });
+
+  testWidgets('Left(cache) storage error -> failed snackbar, no callback', (
+    t,
+  ) async {
+    var missing = 0;
+    await run(t, left(const Failure.cache()), onFileMissing: () => missing++);
+    expect(find.text('Could not import the mod'), findsOneWidget);
+    expect(find.text('File missing, download again'), findsNothing);
+    expect(missing, 0);
   });
 
   testWidgets('other Left -> generic error snackbar, no callback', (t) async {

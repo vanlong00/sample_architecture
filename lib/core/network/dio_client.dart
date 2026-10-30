@@ -32,6 +32,11 @@ Dio buildDio(AppConfig config, CacheStore store) {
 Dio buildDownloadDio(AppConfig config) {
   final dio = Dio(
     BaseOptions(
+      // Redirects are followed by `DownloadRemoteDataSource`, which validates
+      // every hop (F1): never let Dio follow one to an unchecked host.
+      followRedirects: false,
+      // 2xx only: a 3xx must never be written to disk as if it were the file.
+      validateStatus: (s) => s != null && s >= 200 && s < 300,
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(minutes: 2),
     ),

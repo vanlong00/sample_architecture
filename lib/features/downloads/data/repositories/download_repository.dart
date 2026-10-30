@@ -17,8 +17,10 @@ import '../logic/mod_file.dart';
 import '../models/mod_download_record.dart';
 
 /// Result of [DownloadRepository.importToGame]. `notInstalled` means the UI
-/// must offer the Play Store; `failed` means nothing could open the file.
-enum ImportOutcome { sent, notInstalled, chooserOpened, failed }
+/// must offer the Play Store; `failed` means nothing could open the file;
+/// `fileMissing` means the file is verifiably gone from disk (a storage error
+/// while checking is a `Left`, not this).
+enum ImportOutcome { sent, notInstalled, chooserOpened, failed, fileMissing }
 
 abstract class DownloadRepository {
   /// Emits after every record write/delete so lists can refresh.
@@ -47,8 +49,9 @@ abstract class DownloadRepository {
 
   Future<Either<Failure, Unit>> delete(ModDownloadRecord record);
 
-  /// Sends the file to PBSU. `Left(Failure.cache)` when the file is gone (no
-  /// launch attempted); otherwise always `Right(outcome)`, never throws.
+  /// Sends the file to PBSU. `Right(fileMissing)` when the file is gone (no
+  /// launch attempted); `Left(Failure.cache)` when storage could not be
+  /// checked; otherwise always `Right(outcome)`, never throws.
   Future<Either<Failure, ImportOutcome>> importToGame(ModDownloadRecord record);
 }
 
@@ -187,7 +190,9 @@ class DownloadRepositoryImpl implements DownloadRepository {
   Future<Either<Failure, ImportOutcome>> importToGame(
     ModDownloadRecord record,
   ) => guard(() async {
-    if (!await _local.fileExists(record.relPath)) throw CacheException();
+    if (!await _local.fileExists(record.relPath)) {
+      return ImportOutcome.fileMissing;
+    }
     if (!await _launcher.isInstalled()) return ImportOutcome.notInstalled;
 
     final path = await _local.absolutePathOf(record.relPath);
