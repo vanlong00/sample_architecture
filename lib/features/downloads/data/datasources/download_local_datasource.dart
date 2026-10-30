@@ -106,17 +106,37 @@ class DownloadLocalDataSource {
     }
   }
 
+  /// True while the stored value of [key] is still undecodable. Re-checked
+  /// right before each delete so a fresh record written meanwhile (a
+  /// re-download of the same sourceId) is never removed.
+  // ponytail: check-then-delete is not atomic across Isar txns; the window is
+  // one microtask for the record. Make it a conditional delete in LocalStore
+  // if it ever matters.
+  bool _stillCorrupt(String key) {
+    final raw = _store.readRaw(StoreBoxes.modDownloads, key);
+    if (raw == null) return false;
+    try {
+      _decode(jsonDecode(raw));
+      return false;
+    } catch (_) {
+      return true;
+    }
+  }
+
   /// Best effort: removes the corrupt entry and any `<key>.*` file (its
   /// extension is unknown) so nothing is left orphaned. In-progress `.part`
-  /// files are kept.
+  /// files are kept. Nothing is deleted once the entry is no longer corrupt.
   Future<void> _dropCorrupt(String key) async {
     try {
+      if (!_stillCorrupt(key)) return;
       await _store.delete(StoreBoxes.modDownloads, key);
       final dir = Directory(await absolutePathOf('mods'));
       if (!await dir.exists()) return;
       await for (final e in dir.list()) {
         final name = e.path.substring(e.path.lastIndexOf('/') + 1);
         if (e is File && name.startsWith('$key.') && !name.endsWith('.part')) {
+          // A record written after our delete owns this file now.
+          if (_store.readRaw(StoreBoxes.modDownloads, key) != null) return;
           await e.delete();
         }
       }
@@ -129,10 +149,10 @@ class DownloadLocalDataSource {
   /// overwrites it).
   ModDownloadRecord? readRecord(int sourceId) {
     try {
-      final raw = _store.read<Object>(StoreBoxes.modDownloads, '$sourceId');
+      final raw = _store.readRaw(StoreBoxes.modDownloads, '$sourceId');
       if (raw == null) return null;
       try {
-        return _decode(raw);
+        return _decode(jsonDecode(raw));
       } catch (e, st) {
         recordError(e, st, reason: 'downloads: corrupt record $sourceId');
         return null;
@@ -162,6 +182,20 @@ class DownloadLocalDataSource {
     }
   }
 
-  static ModDownloadRecord _decode(Object? raw) =>
-      ModDownloadRecord.fromJson(Map<String, dynamic>.from(raw! as Map));
+  static final _safeRelPath = RegExp(r'^mods/(\d+)\.[A-Za-z0-9]+$');
+
+  /// Throws on a wrong shape or a tampered `relPath`: it is read back from
+  /// storage and later reaches the file system and the chooser fallback, so
+  /// only `mods/<sourceId>.<ext>` is accepted (the record is then handled as
+  /// corrupt).
+  static ModDownloadRecord _decode(Object? raw) {
+    final record = ModDownloadRecord.fromJson(
+      Map<String, dynamic>.from(raw! as Map),
+    );
+    final m = _safeRelPath.firstMatch(record.relPath);
+    if (m == null || m.group(1) != '${record.sourceId}') {
+      throw FormatException('unsafe relPath', record.relPath);
+    }
+    return record;
+  }
 }

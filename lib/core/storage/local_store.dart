@@ -67,6 +67,11 @@ class LocalStore {
     return jsonDecode(entry.value) as T?;
   }
 
+  /// Raw (undecoded) JSON string of [key], or `null` when absent: lets a caller
+  /// decode inside its own try so a corrupt value cannot throw from here.
+  String? readRaw(String box, String key) =>
+      _db.kvEntrys.getByBoxKeySync(box, key)?.value;
+
   /// Upsert: writing an existing key overwrites it.
   Future<void> write<T>(String box, String key, T value) async {
     final entry = KvEntry()

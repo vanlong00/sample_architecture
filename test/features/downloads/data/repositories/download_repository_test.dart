@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:busmod/core/error/exceptions.dart';
 import 'package:busmod/core/error/failure.dart';
+import 'package:busmod/core/storage/kv_entry.dart';
 import 'package:busmod/core/storage/local_store.dart';
 import 'package:busmod/features/downloads/data/datasources/download_local_datasource.dart';
 import 'package:busmod/features/downloads/data/datasources/download_remote_datasource.dart';
@@ -17,6 +18,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:isar_community/isar.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/isar_test_setup.dart';
@@ -46,6 +48,14 @@ const _badUrls = [
   'a.zip',
   'javascript:alert(1)//a.zip',
 ];
+
+class _ThrowingExistsLocal extends DownloadLocalDataSource {
+  _ThrowingExistsLocal(super.store, String dir)
+    : super(supportDir: () async => dir);
+
+  @override
+  Future<bool> fileExists(String relPath) async => throw CacheException();
+}
 
 class _ThrowingPartLocal extends DownloadLocalDataSource {
   _ThrowingPartLocal(super.store, String dir)
@@ -282,6 +292,30 @@ void main() {
     );
   });
 
+  test(
+    'undecodable stored value: find is right(null), re-download works',
+    () async {
+      final isar = Isar.getInstance()!;
+      await isar.writeTxn(
+        () => isar.kvEntrys.putByBoxKey(
+          KvEntry()
+            ..box = StoreBoxes.modDownloads
+            ..key = '1'
+            ..value = '{not json',
+        ),
+      );
+      expect(
+        await repo.find(1),
+        const Right<Failure, ModDownloadRecord?>(null),
+      );
+
+      stubWrite([1, 2, 3]);
+      final r = await repo.download(mod(1, url: 'https://cdn.x/a.zip'));
+      expect(r.isRight(), isTrue);
+      expect((await repo.find(1)).toNullable()?.sourceId, 1);
+    },
+  );
+
   test('concurrent download of one sourceId is one transfer', () async {
     final gate = Completer<void>();
     var calls = 0;
@@ -391,10 +425,21 @@ void main() {
     Future<ImportOutcome> import(ModDownloadRecord rec) async =>
         (await repo.importToGame(rec)).getOrElse((_) => fail('expected Right'));
 
-    test('missing file: Left cache, launcher untouched', () async {
+    test('missing file: fileMissing, launcher untouched', () async {
       final rec = await downloaded('https://cdn.x/a.zip');
       File('${support.path}/${rec.relPath}').deleteSync();
-      final r = await repo.importToGame(rec);
+      expect(await import(rec), ImportOutcome.fileMissing);
+      verifyZeroInteractions(launcher);
+    });
+
+    test('storage error while checking: Left cache, NOT fileMissing', () async {
+      final rec = await downloaded('https://cdn.x/a.zip');
+      final failing = _ThrowingExistsLocal(store, support.path);
+      final r = await DownloadRepositoryImpl(
+        remote,
+        failing,
+        launcher,
+      ).importToGame(rec);
       expect(
         r.swap().getOrElse((_) => fail('expected Left')),
         isA<CacheFailure>(),

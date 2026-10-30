@@ -280,7 +280,7 @@ void main() {
   ) async {
     when(
       () => cubit.importToGame(record),
-    ).thenAnswer((_) async => left(const Failure.cache()));
+    ).thenAnswer((_) async => right(ImportOutcome.fileMissing));
     await pump(t, const ModDownloadState.downloaded(record));
     await t.tap(find.text('Import to PBSU'));
     await t.pumpAndSettle();

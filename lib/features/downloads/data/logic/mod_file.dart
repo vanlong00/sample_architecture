@@ -13,16 +13,30 @@ String? fileExtensionOf(String storageUrl) {
   return ext;
 }
 
+/// Cleartext http is refused unless the app is run with
+/// `--dart-define=ALLOW_HTTP_STORAGE=true` (dev servers). Android's
+/// network_security_config does not apply to dart:io, so the app must refuse
+/// cleartext itself. Same pattern as `BASE_URL` in `AppConfig`; defaults to
+/// secure.
+// ponytail: compile-time define, not AppConfig: the mods models call the
+// predicate without DI. Move to AppConfig if the models ever get it.
+const kAllowHttpStorage = bool.fromEnvironment('ALLOW_HTTP_STORAGE');
+
 /// F1: the one rule for "this mod can be downloaded". [storageUrl] must be an
-/// http(s) URL with a real host that is not a blocked third-party source and
-/// name a file with a safe extension. Shared by the model (`isMirrored`) and
-/// the repository (checked before any network call).
-// ponytail: http allowed because dev servers are plain http; tighten with AppConfig if needed.
-bool isAllowedStorageUrl(String? storageUrl) {
+/// https URL (http only when [allowHttp]) with a real host that is not a
+/// blocked third-party source and name a file with a safe extension. Shared by
+/// the model (`isMirrored`), the repository (checked before any network call)
+/// and every redirect hop of the remote data source.
+bool isAllowedStorageUrl(
+  String? storageUrl, {
+  bool allowHttp = kAllowHttpStorage,
+}) {
   if (storageUrl == null || fileExtensionOf(storageUrl) == null) return false;
   final uri = Uri.tryParse(storageUrl);
   if (uri == null || uri.host.isEmpty) return false;
-  if (uri.scheme != 'https' && uri.scheme != 'http') return false;
+  if (uri.scheme != 'https' && !(allowHttp && uri.scheme == 'http')) {
+    return false;
+  }
   return !isBlockedHost(uri);
 }
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:busmod/core/error/exceptions.dart';
@@ -21,15 +22,43 @@ ModDownloadRecord rec(int id, {int at = 1}) => ModDownloadRecord(
   createdAtMs: at,
 );
 
+/// Real Isar store with two test seams for the corrupt-drop race.
+class _HookedStore extends LocalStore {
+  Future<void> Function()? afterDelete;
+  String? staleCorruptKey;
+
+  @override
+  Future<void> delete(String box, String key) async {
+    await super.delete(box, key);
+    final hook = afterDelete;
+    afterDelete = null;
+    await hook?.call();
+  }
+
+  @override
+  Map<String, String> readAllRaw(String box) {
+    final all = super.readAllRaw(box);
+    final key = staleCorruptKey;
+    staleCorruptKey = null;
+    return key == null ? all : {...all, key: '{not json'};
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  late LocalStore store;
+  late _HookedStore store;
   late Directory support;
   late DownloadLocalDataSource ds;
 
   setUp(() async {
-    store = await openTestStore();
+    await initIsarCoreForTests();
+    store = _HookedStore();
+    await store.init(
+      directory: (await Directory.systemTemp.createTemp(
+        'busmod_local_hook',
+      )).path,
+    );
     support = await Directory.systemTemp.createTemp('busmod_support');
     ds = DownloadLocalDataSource(store, supportDir: () async => support.path);
   });
@@ -72,6 +101,89 @@ void main() {
     expect(part.existsSync(), isTrue); // in-progress download untouched
     expect(other.existsSync(), isTrue);
   });
+
+  test(
+    'undecodable stored value: readRecord is null, not CacheException',
+    () async {
+      final isar = Isar.getInstance()!;
+      await isar.writeTxn(
+        () => isar.kvEntrys.putByBoxKey(
+          KvEntry()
+            ..box = StoreBoxes.modDownloads
+            ..key = '8'
+            ..value = '{not json',
+        ),
+      );
+      expect(ds.readRecord(8), isNull);
+      expect(store.readRaw(StoreBoxes.modDownloads, '8'), '{not json'); // kept
+    },
+  );
+
+  test(
+    'drop of a corrupt entry never deletes a record written meanwhile',
+    () async {
+      await store.write(StoreBoxes.modDownloads, '5', {'bad': 1});
+      final file = File('${support.path}/mods/5.zip')
+        ..createSync(recursive: true);
+      final deleted = Completer<void>();
+      // A fresh record lands right after the corrupt entry was deleted, before
+      // the file sweep.
+      store.afterDelete = () async {
+        await store.write(StoreBoxes.modDownloads, '5', rec(5).toJson());
+        deleted.complete();
+      };
+
+      ds.readRecords();
+      await deleted.future;
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+
+      expect(ds.readRecord(5), rec(5));
+      expect(file.existsSync(), isTrue);
+    },
+  );
+
+  test('entry fixed before the drop runs is not dropped at all', () async {
+    await ds.writeRecord(rec(6));
+    final file = File('${support.path}/mods/6.RAR')
+      ..createSync(recursive: true);
+    store.staleCorruptKey = '6'; // the list read sees it corrupt once
+    ds.readRecords();
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    expect(ds.readRecord(6), rec(6));
+    expect(file.existsSync(), isTrue);
+  });
+
+  test(
+    'tampered relPath is treated as corrupt: null, dropped from list',
+    () async {
+      final bad = {
+        '1': 'mods/../x.zip',
+        '2': '/data/data/x/2.zip',
+        '3': 'other/3.zip',
+        '4': 'mods/9.zip', // number differs from sourceId
+        '5': 'mods/5.zip/../../x',
+        '6': 'mods/6.',
+      };
+      for (final e in bad.entries) {
+        await store.write(
+          StoreBoxes.modDownloads,
+          e.key,
+          rec(int.parse(e.key)).toJson()..['relPath'] = e.value,
+        );
+        expect(ds.readRecord(int.parse(e.key)), isNull, reason: e.value);
+      }
+      await ds.writeRecord(rec(7));
+      expect(ds.readRecords(), [rec(7)]);
+      for (
+        var i = 0;
+        i < 50 && store.readAllRaw(StoreBoxes.modDownloads).length > 1;
+        i++
+      ) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
+      expect(store.readAllRaw(StoreBoxes.modDownloads).keys, ['7']);
+    },
+  );
 
   test('undecodable JSON value: that entry is dropped, the rest lists', () async {
     await ds.writeRecord(rec(1));

@@ -148,7 +148,7 @@ void main() {
     final r = rec(5);
     when(
       () => cubit.importToGame(any()),
-    ).thenAnswer((_) async => left(const Failure.cache()));
+    ).thenAnswer((_) async => right(ImportOutcome.fileMissing));
     await pump(t, DownloadedState.success(records: [r], totalBytes: 1024));
     await t.tap(find.text('Import to PBSU'));
     await t.pumpAndSettle();
