@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:busmod/core/error/failure.dart';
 import 'package:busmod/core/l10n/app_localizations.dart';
 import 'package:busmod/features/mods/data/models/mod_card.dart';
 import 'package:busmod/features/mods/data/models/mod_type.dart';
+import 'package:busmod/features/mods/data/repositories/mods_repository.dart';
 import 'package:busmod/features/mods/presentation/bloc/search_bloc.dart';
 import 'package:busmod/features/mods/presentation/bloc/search_event.dart';
 import 'package:busmod/features/mods/presentation/bloc/search_state.dart';
@@ -11,6 +14,7 @@ import 'package:busmod/features/mods/presentation/widgets/mod_card_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -18,6 +22,8 @@ class MockSearchBloc extends MockBloc<SearchEvent, SearchState>
     implements SearchBloc {}
 
 ModCard card(int i) => ModCard(sourceId: i, type: ModType.bus, title: 'Mod $i');
+
+class _MockRepo extends Mock implements ModsRepository {}
 
 SearchState success(List<ModCard> items) => SearchState.success(
   query: 'bus',
@@ -138,5 +144,130 @@ void main() {
     await t.pump();
     expect(t.widget<TextField>(find.byType(TextField)).controller!.text, '');
     verify(() => bloc.add(const SearchEvent.queryChanged(''))).called(1);
+  });
+
+  group('pull to refresh (real SearchBloc)', () {
+    late _MockRepo repo;
+    late SearchBloc real;
+
+    ModPage pageOf(List<int> ids) =>
+        (items: ids.map(card).toList(), nextSkip: 20, hasMore: false);
+
+    void stubFirst(List<int> ids) => when(
+      () => repo.search(query: 'bus', type: null, skip: 0),
+    ).thenAnswer((_) async => right(pageOf(ids)));
+
+    When<Future<Either<Failure, ModPage>>> refreshCall() => when(
+      () => repo.search(query: 'bus', type: null, skip: 0, forceRefresh: true),
+    );
+
+    Future<void> pumpReal(WidgetTester t) async {
+      real = SearchBloc(repo);
+      // Not closed: awaiting close() inside the fake-async test zone hangs.
+      addTearDown(() => unawaited(real.close()));
+      await t.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: BlocProvider<SearchBloc>.value(
+              value: real,
+              child: const SearchPage(),
+            ),
+          ),
+        ),
+      );
+      await t.enterText(find.byType(TextField), 'bus');
+      await t.pump(SearchBloc.debounce);
+      await t.pump();
+    }
+
+    Future<void> pull(WidgetTester t) async {
+      await t.fling(find.byType(Scrollable).last, const Offset(0, 300), 1000);
+      await t.pump();
+      await t.pump(const Duration(seconds: 1));
+    }
+
+    setUp(() => repo = _MockRepo());
+
+    testWidgets('list stays rendered while the refresh is in flight', (
+      t,
+    ) async {
+      stubFirst([1, 2]);
+      await pumpReal(t);
+      expect(find.text('Mod 1'), findsOneWidget);
+      final gate = Completer<Either<Failure, ModPage>>();
+      refreshCall().thenAnswer((_) => gate.future);
+
+      await pull(t);
+      verify(
+        () =>
+            repo.search(query: 'bus', type: null, skip: 0, forceRefresh: true),
+      ).called(1);
+      expect(real.state, isA<SearchSuccess>()); // no SearchLoading
+      expect(find.text('Mod 1'), findsOneWidget);
+      expect(find.byType(RefreshIndicator), findsOneWidget);
+
+      gate.complete(right(pageOf([3])));
+      await t.pumpAndSettle();
+      expect(find.text('Mod 3'), findsOneWidget);
+      expect(find.text('Mod 1'), findsNothing);
+      // The indicator completed: nothing is spinning any more.
+      expect(find.byType(RefreshProgressIndicator), findsNothing);
+    });
+
+    testWidgets('refresh failure keeps the items and shows a snackbar', (
+      t,
+    ) async {
+      stubFirst([1]);
+      await pumpReal(t);
+      refreshCall().thenAnswer((_) async => left(const Failure.network()));
+
+      await pull(t);
+      await t.pumpAndSettle();
+      expect(find.text('Mod 1'), findsOneWidget);
+      expect(find.text('No internet connection.'), findsOneWidget);
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.byType(RefreshProgressIndicator), findsNothing);
+    });
+
+    testWidgets('a query change during a refresh wins over its result', (
+      t,
+    ) async {
+      stubFirst([1]);
+      await pumpReal(t);
+      final gate = Completer<Either<Failure, ModPage>>();
+      refreshCall().thenAnswer((_) => gate.future);
+      when(
+        () => repo.search(query: 'car', type: null, skip: 0),
+      ).thenAnswer((_) async => right(pageOf([9])));
+
+      await pull(t);
+      await t.enterText(find.byType(TextField), 'car');
+      await t.pump(SearchBloc.debounce);
+      await t.pump();
+      gate.complete(right(pageOf([5])));
+      await t.pumpAndSettle();
+      expect(find.text('Mod 9'), findsOneWidget);
+      expect(find.text('Mod 5'), findsNothing);
+      expect(find.byType(RefreshProgressIndicator), findsNothing);
+    });
+
+    testWidgets('empty result supports pull to refresh', (t) async {
+      stubFirst([]);
+      await pumpReal(t);
+      expect(find.text('No mods found'), findsOneWidget);
+      expect(find.byType(RefreshIndicator), findsOneWidget);
+      refreshCall().thenAnswer((_) async => right(pageOf([4])));
+
+      await pull(t);
+      await t.pumpAndSettle();
+      verify(
+        () =>
+            repo.search(query: 'bus', type: null, skip: 0, forceRefresh: true),
+      ).called(1);
+      expect(find.text('Mod 4'), findsOneWidget);
+    });
   });
 }

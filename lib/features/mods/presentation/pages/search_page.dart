@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/error/failure.dart';
 import '../../../../core/error/failure_mapper.dart';
 import '../../../../core/l10n/l10n_ext.dart';
 import '../../../../core/router/routes.dart';
@@ -155,13 +158,19 @@ class _TypeChips extends StatelessWidget {
 class _SearchBody extends StatelessWidget {
   const _SearchBody();
 
+  /// Completes when the refresh settles. A failure leaves the old list on
+  /// screen and is reported with a snackbar.
   Future<void> _refresh(BuildContext context) async {
-    final bloc = context.read<SearchBloc>();
-    bloc.add(const SearchEvent.refresh());
-    // Resolves once the re-run (loading) settles.
-    await bloc.stream
-        .skipWhile((s) => s is! SearchLoading)
-        .firstWhere((s) => s is! SearchLoading, orElse: () => bloc.state);
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final done = Completer<Failure?>();
+    context.read<SearchBloc>().add(SearchEvent.refresh(done));
+    final failure = await done.future;
+    if (failure != null) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(mapFailureToMessage(failure, l10n))),
+      );
+    }
   }
 
   @override
@@ -171,11 +180,9 @@ class _SearchBody extends StatelessWidget {
       builder: (context, state) => switch (state) {
         SearchInitial() => _Prompt(text: l10n.searchHint),
         SearchLoading() => const LoadingView(),
-        SearchSuccess(items: final items) when items.isEmpty => _Prompt(
-          text: l10n.searchEmpty,
-        ),
         SearchSuccess() => ModPagedList(
           items: state.items,
+          emptyText: l10n.searchEmpty,
           hasMore: state.hasMore,
           loadingMore: state.loadingMore,
           loadMoreFailure: state.loadMoreFailure,

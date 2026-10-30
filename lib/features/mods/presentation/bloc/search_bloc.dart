@@ -2,6 +2,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../../core/error/failure.dart';
 import '../../data/models/mod_type.dart';
 import '../../data/repositories/mods_repository.dart';
 import 'search_event.dart';
@@ -26,7 +27,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   String _query = '';
   ModType? _type;
 
-  /// Bumped by every query/type/retry. The three handlers have separate
+  /// Bumped by every query/type/retry/refresh. The three handlers have separate
   /// restartable() queues, so they do not cancel each other: a result whose
   /// generation is stale is dropped instead.
   int _gen = 0;
@@ -62,35 +63,56 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     SearchRefresh event,
     Emitter<SearchState> emit,
   ) async {
-    if (state is SearchInitial) return;
-    await _search(emit, ++_gen, forceRefresh: true);
+    Failure? failure;
+    try {
+      if (state is SearchInitial) return;
+      // Like ModListCubit.refresh: keep the list on screen while reloading.
+      failure = await _search(
+        emit,
+        ++_gen,
+        forceRefresh: true,
+        silent: state is SearchSuccess,
+      );
+    } finally {
+      event.done?.complete(failure);
+    }
   }
 
-  Future<void> _search(
+  /// Returns the failure only for a [silent] run (the old list stays, the
+  /// caller reports it); otherwise the failure is emitted as state.
+  Future<Failure?> _search(
     Emitter<SearchState> emit,
     int gen, {
     bool forceRefresh = false,
+    bool silent = false,
   }) async {
     final (query, type) = (_query, _type);
-    emit(SearchState.loading(query: query, type: type));
+    if (!silent) emit(SearchState.loading(query: query, type: type));
     final result = await fetchVisiblePage(
       (skip) => forceRefresh && skip == 0
           ? _repo.search(query: query, type: type, skip: 0, forceRefresh: true)
           : _repo.search(query: query, type: type, skip: skip),
       0,
     );
-    if (emit.isDone || gen != _gen) return;
-    emit(
-      result.fold(
-        (f) => SearchState.failure(failure: f, query: query, type: type),
-        (page) => SearchState.success(
-          query: query,
-          type: type,
-          items: page.items,
-          nextSkip: page.nextSkip,
-          hasMore: page.hasMore,
-        ),
-      ),
+    if (emit.isDone || gen != _gen) return null;
+    return result.fold(
+      (f) {
+        if (silent) return f;
+        emit(SearchState.failure(failure: f, query: query, type: type));
+        return null;
+      },
+      (page) {
+        emit(
+          SearchState.success(
+            query: query,
+            type: type,
+            items: page.items,
+            nextSkip: page.nextSkip,
+            hasMore: page.hasMore,
+          ),
+        );
+        return null;
+      },
     );
   }
 

@@ -321,4 +321,123 @@ void main() {
       await b.close();
     },
   );
+
+  group('refresh keeps the list on screen', () {
+    Future<SearchBloc> searched() async {
+      stubSearch('bus', null, 0, right(page([1], next: 20)));
+      final b = SearchBloc(repo)..add(const SearchEvent.queryChanged('bus'));
+      await Future<void>.delayed(settle);
+      return b;
+    }
+
+    void stubRefresh(Future<Either<Failure, ModPage>> Function() answer) =>
+        when(
+          () => repo.search(
+            query: 'bus',
+            type: null,
+            skip: 0,
+            forceRefresh: true,
+          ),
+        ).thenAnswer((_) => answer());
+
+    test('no loading emit; completer completes null on success', () async {
+      final b = await searched();
+      stubRefresh(() async => right(page([7], next: 20)));
+      final states = <SearchState>[];
+      final sub = b.stream.listen(states.add);
+      final done = Completer<Failure?>();
+      b.add(SearchEvent.refresh(done));
+      expect(await done.future, isNull);
+      expect(states, [
+        ok('bus', [7]),
+      ]);
+      await sub.cancel();
+      await b.close();
+    });
+
+    test(
+      'failure keeps the old list and reports it via the completer',
+      () async {
+        final b = await searched();
+        stubRefresh(() async => left(failure));
+        final states = <SearchState>[];
+        final sub = b.stream.listen(states.add);
+        final done = Completer<Failure?>();
+        b.add(SearchEvent.refresh(done));
+        expect(await done.future, failure);
+        expect(states, isEmpty);
+        expect(b.state, ok('bus', [1]));
+        await sub.cancel();
+        await b.close();
+      },
+    );
+
+    test('completer completes even when nothing was searched', () async {
+      final b = SearchBloc(repo);
+      final done = Completer<Failure?>();
+      b.add(SearchEvent.refresh(done));
+      expect(await done.future, isNull);
+      await b.close();
+    });
+
+    test('queryChanged during a refresh drops the stale result', () async {
+      final b = await searched();
+      final slow = Completer<Either<Failure, ModPage>>();
+      stubRefresh(() => slow.future);
+      stubSearch('car', null, 0, right(page([8], next: 20)));
+      final done = Completer<Failure?>();
+      b.add(SearchEvent.refresh(done));
+      await Future<void>.delayed(Duration.zero);
+      b.add(const SearchEvent.queryChanged('car'));
+      await Future<void>.delayed(settle);
+      slow.complete(right(page([7], next: 20)));
+      expect(await done.future, isNull);
+      expect(b.state, ok('car', [8]));
+      await b.close();
+    });
+
+    test('a stale refresh failure is not reported or shown', () async {
+      final b = await searched();
+      final slow = Completer<Either<Failure, ModPage>>();
+      stubRefresh(() => slow.future);
+      stubSearch('bus', ModType.truck, 0, right(page([5], next: 20)));
+      final done = Completer<Failure?>();
+      b.add(SearchEvent.refresh(done));
+      await Future<void>.delayed(Duration.zero);
+      b.add(const SearchEvent.typeChanged(ModType.truck));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      slow.complete(left(failure));
+      expect(await done.future, isNull);
+      expect(b.state, ok('bus', [5], type: ModType.truck));
+      await b.close();
+    });
+
+    test('clearing the field during a refresh stays initial', () async {
+      final b = await searched();
+      final slow = Completer<Either<Failure, ModPage>>();
+      stubRefresh(() => slow.future);
+      final done = Completer<Failure?>();
+      b.add(SearchEvent.refresh(done));
+      await Future<void>.delayed(Duration.zero);
+      b.add(const SearchEvent.queryChanged(''));
+      await Future<void>.delayed(Duration.zero);
+      slow.complete(right(page([7], next: 20)));
+      expect(await done.future, isNull);
+      expect(b.state, const SearchState.initial());
+      await b.close();
+    });
+
+    test('loadMore keeps working after a refresh', () async {
+      final b = await searched();
+      stubRefresh(() async => right(page([7], next: 20)));
+      stubSearch('bus', null, 20, right(page([8], next: 40, more: false)));
+      final done = Completer<Failure?>();
+      b.add(SearchEvent.refresh(done));
+      await done.future;
+      b.add(const SearchEvent.loadMore());
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(b.state, ok('bus', [7, 8], next: 40, more: false));
+      await b.close();
+    });
+  });
 }

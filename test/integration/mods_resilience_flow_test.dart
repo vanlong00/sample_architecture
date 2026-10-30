@@ -302,6 +302,45 @@ void main() {
       expect(bloc.state, const SearchState.initial());
       await bloc.close();
     });
+
+    test('a refresh keeps the list (no loading) and a newer query wins over '
+        'its late answer', () async {
+      final bloc = SearchBloc(repo)..add(const SearchEvent.queryChanged('bus'));
+      await Future<void>.delayed(settle);
+      final states = <SearchState>[];
+      final sub = bloc.stream.listen(states.add);
+
+      gates['bus|null'] = Completer<void>();
+      final done = Completer<Failure?>();
+      bloc.add(SearchEvent.refresh(done)); // slow, in flight
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(states, isEmpty); // list stayed, no SearchLoading
+      expect((bloc.state as SearchSuccess).query, 'bus');
+
+      bloc.add(const SearchEvent.queryChanged('car'));
+      await Future<void>.delayed(settle);
+      gates['bus|null']!.complete(); // refresh answer arrives last
+      expect(await done.future, isNull);
+
+      final s = bloc.state as SearchSuccess;
+      expect(s.query, 'car');
+      expect(s.items.single.sourceId, idFor('car', null));
+      await sub.cancel();
+      await bloc.close();
+    });
+
+    test('a refresh that fails over HTTP keeps the old list', () async {
+      final bloc = SearchBloc(repo)..add(const SearchEvent.queryChanged('bus'));
+      await Future<void>.delayed(settle);
+      final before = bloc.state;
+      // 5xx would be served from the HTTP cache by design; 400 is not.
+      api.handler = (_) => (400, {'detail': 'bad'});
+      final done = Completer<Failure?>();
+      bloc.add(SearchEvent.refresh(done));
+      expect(await done.future, isNotNull);
+      expect(bloc.state, before);
+      await bloc.close();
+    });
   });
 
   group('detail errors over real HTTP', () {
