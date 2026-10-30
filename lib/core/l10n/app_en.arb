@@ -67,6 +67,7 @@
   "proSubscribe": "Subscribe",
   "proRestored": "Purchases restored",
   "proNothingToRestore": "Nothing to restore",
+  "proPending": "Your payment is pending. Pro will unlock when it is confirmed.",
   "proPurchaseFailed": "Purchase failed",
   "adLabel": "Ad",
   "retry": "Retry",

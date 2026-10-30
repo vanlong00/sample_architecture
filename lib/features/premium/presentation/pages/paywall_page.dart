@@ -33,6 +33,7 @@ class _PaywallPageState extends State<PaywallPage> {
           s is PaywallPurchased ||
           s is PaywallRestored ||
           s is PaywallInfo ||
+          s is PaywallPending ||
           s is PaywallError,
       listener: (context, state) {
         switch (state) {
@@ -44,6 +45,8 @@ class _PaywallPageState extends State<PaywallPage> {
             if (context.canPop()) context.pop();
           case PaywallInfo():
             context.showAppSnackBar(l10n.proNothingToRestore);
+          case PaywallPending():
+            context.showAppSnackBar(l10n.proPending);
           case PaywallError():
             context.showAppSnackBar(
               state.fromRestore

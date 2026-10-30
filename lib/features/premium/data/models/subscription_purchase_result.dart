@@ -8,6 +8,7 @@ part 'subscription_purchase_result.freezed.dart';
 sealed class SubscriptionPurchaseResult with _$SubscriptionPurchaseResult {
   const factory SubscriptionPurchaseResult.purchased() = PurchaseSucceeded;
   const factory SubscriptionPurchaseResult.restored() = PurchaseRestored;
+  const factory SubscriptionPurchaseResult.pending() = PurchasePending;
   const factory SubscriptionPurchaseResult.canceled() = PurchaseCanceled;
   const factory SubscriptionPurchaseResult.error(String message) =
       PurchaseFailed;

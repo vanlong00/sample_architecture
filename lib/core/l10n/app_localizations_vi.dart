@@ -221,6 +221,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get proNothingToRestore => 'Không có gì để khôi phục';
 
   @override
+  String get proPending =>
+      'Thanh toán đang chờ xử lý. Pro sẽ được mở khi giao dịch được xác nhận.';
+
+  @override
   String get proPurchaseFailed => 'Giao dịch thất bại';
 
   @override

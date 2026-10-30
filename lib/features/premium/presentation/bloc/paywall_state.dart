@@ -8,6 +8,10 @@ sealed class PaywallState with _$PaywallState {
   const factory PaywallState.idle() = PaywallIdle;
   const factory PaywallState.purchasing() = PaywallPurchasing;
   const factory PaywallState.restoring() = PaywallRestoring;
+
+  /// Play is waiting on the payment method (cash, carrier billing...): not
+  /// blocking, the user may subscribe or restore again.
+  const factory PaywallState.pending() = PaywallPending;
   const factory PaywallState.purchased() = PaywallPurchased;
   const factory PaywallState.restored() = PaywallRestored;
   const factory PaywallState.error(

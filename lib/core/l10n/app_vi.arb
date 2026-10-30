@@ -67,6 +67,7 @@
   "proSubscribe": "Đăng ký",
   "proRestored": "Đã khôi phục giao dịch",
   "proNothingToRestore": "Không có gì để khôi phục",
+  "proPending": "Thanh toán đang chờ xử lý. Pro sẽ được mở khi giao dịch được xác nhận.",
   "proPurchaseFailed": "Giao dịch thất bại",
   "adLabel": "Quảng cáo",
   "retry": "Thử lại",

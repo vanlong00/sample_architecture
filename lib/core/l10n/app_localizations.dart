@@ -500,6 +500,12 @@ abstract class AppLocalizations {
   /// **'Nothing to restore'**
   String get proNothingToRestore;
 
+  /// No description provided for @proPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Your payment is pending. Pro will unlock when it is confirmed.'**
+  String get proPending;
+
   /// No description provided for @proPurchaseFailed.
   ///
   /// In en, this message translates to:

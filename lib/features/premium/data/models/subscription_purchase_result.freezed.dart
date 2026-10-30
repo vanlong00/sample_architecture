@@ -55,12 +55,13 @@ extension SubscriptionPurchaseResultPatterns on SubscriptionPurchaseResult {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( PurchaseSucceeded value)?  purchased,TResult Function( PurchaseRestored value)?  restored,TResult Function( PurchaseCanceled value)?  canceled,TResult Function( PurchaseFailed value)?  error,TResult Function( NothingToRestore value)?  nothingToRestore,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( PurchaseSucceeded value)?  purchased,TResult Function( PurchaseRestored value)?  restored,TResult Function( PurchasePending value)?  pending,TResult Function( PurchaseCanceled value)?  canceled,TResult Function( PurchaseFailed value)?  error,TResult Function( NothingToRestore value)?  nothingToRestore,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case PurchaseSucceeded() when purchased != null:
 return purchased(_that);case PurchaseRestored() when restored != null:
-return restored(_that);case PurchaseCanceled() when canceled != null:
+return restored(_that);case PurchasePending() when pending != null:
+return pending(_that);case PurchaseCanceled() when canceled != null:
 return canceled(_that);case PurchaseFailed() when error != null:
 return error(_that);case NothingToRestore() when nothingToRestore != null:
 return nothingToRestore(_that);case _:
@@ -81,12 +82,13 @@ return nothingToRestore(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( PurchaseSucceeded value)  purchased,required TResult Function( PurchaseRestored value)  restored,required TResult Function( PurchaseCanceled value)  canceled,required TResult Function( PurchaseFailed value)  error,required TResult Function( NothingToRestore value)  nothingToRestore,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( PurchaseSucceeded value)  purchased,required TResult Function( PurchaseRestored value)  restored,required TResult Function( PurchasePending value)  pending,required TResult Function( PurchaseCanceled value)  canceled,required TResult Function( PurchaseFailed value)  error,required TResult Function( NothingToRestore value)  nothingToRestore,}){
 final _that = this;
 switch (_that) {
 case PurchaseSucceeded():
 return purchased(_that);case PurchaseRestored():
-return restored(_that);case PurchaseCanceled():
+return restored(_that);case PurchasePending():
+return pending(_that);case PurchaseCanceled():
 return canceled(_that);case PurchaseFailed():
 return error(_that);case NothingToRestore():
 return nothingToRestore(_that);}
@@ -103,12 +105,13 @@ return nothingToRestore(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( PurchaseSucceeded value)?  purchased,TResult? Function( PurchaseRestored value)?  restored,TResult? Function( PurchaseCanceled value)?  canceled,TResult? Function( PurchaseFailed value)?  error,TResult? Function( NothingToRestore value)?  nothingToRestore,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( PurchaseSucceeded value)?  purchased,TResult? Function( PurchaseRestored value)?  restored,TResult? Function( PurchasePending value)?  pending,TResult? Function( PurchaseCanceled value)?  canceled,TResult? Function( PurchaseFailed value)?  error,TResult? Function( NothingToRestore value)?  nothingToRestore,}){
 final _that = this;
 switch (_that) {
 case PurchaseSucceeded() when purchased != null:
 return purchased(_that);case PurchaseRestored() when restored != null:
-return restored(_that);case PurchaseCanceled() when canceled != null:
+return restored(_that);case PurchasePending() when pending != null:
+return pending(_that);case PurchaseCanceled() when canceled != null:
 return canceled(_that);case PurchaseFailed() when error != null:
 return error(_that);case NothingToRestore() when nothingToRestore != null:
 return nothingToRestore(_that);case _:
@@ -128,11 +131,12 @@ return nothingToRestore(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  purchased,TResult Function()?  restored,TResult Function()?  canceled,TResult Function( String message)?  error,TResult Function()?  nothingToRestore,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  purchased,TResult Function()?  restored,TResult Function()?  pending,TResult Function()?  canceled,TResult Function( String message)?  error,TResult Function()?  nothingToRestore,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case PurchaseSucceeded() when purchased != null:
 return purchased();case PurchaseRestored() when restored != null:
-return restored();case PurchaseCanceled() when canceled != null:
+return restored();case PurchasePending() when pending != null:
+return pending();case PurchaseCanceled() when canceled != null:
 return canceled();case PurchaseFailed() when error != null:
 return error(_that.message);case NothingToRestore() when nothingToRestore != null:
 return nothingToRestore();case _:
@@ -153,11 +157,12 @@ return nothingToRestore();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  purchased,required TResult Function()  restored,required TResult Function()  canceled,required TResult Function( String message)  error,required TResult Function()  nothingToRestore,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  purchased,required TResult Function()  restored,required TResult Function()  pending,required TResult Function()  canceled,required TResult Function( String message)  error,required TResult Function()  nothingToRestore,}) {final _that = this;
 switch (_that) {
 case PurchaseSucceeded():
 return purchased();case PurchaseRestored():
-return restored();case PurchaseCanceled():
+return restored();case PurchasePending():
+return pending();case PurchaseCanceled():
 return canceled();case PurchaseFailed():
 return error(_that.message);case NothingToRestore():
 return nothingToRestore();}
@@ -174,11 +179,12 @@ return nothingToRestore();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  purchased,TResult? Function()?  restored,TResult? Function()?  canceled,TResult? Function( String message)?  error,TResult? Function()?  nothingToRestore,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  purchased,TResult? Function()?  restored,TResult? Function()?  pending,TResult? Function()?  canceled,TResult? Function( String message)?  error,TResult? Function()?  nothingToRestore,}) {final _that = this;
 switch (_that) {
 case PurchaseSucceeded() when purchased != null:
 return purchased();case PurchaseRestored() when restored != null:
-return restored();case PurchaseCanceled() when canceled != null:
+return restored();case PurchasePending() when pending != null:
+return pending();case PurchaseCanceled() when canceled != null:
 return canceled();case PurchaseFailed() when error != null:
 return error(_that.message);case NothingToRestore() when nothingToRestore != null:
 return nothingToRestore();case _:
@@ -245,6 +251,38 @@ int get hashCode => runtimeType.hashCode;
 @override
 String toString() {
   return 'SubscriptionPurchaseResult.restored()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class PurchasePending implements SubscriptionPurchaseResult {
+  const PurchasePending();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PurchasePending);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'SubscriptionPurchaseResult.pending()';
 }
 
 
